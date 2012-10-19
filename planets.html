@@ -6,96 +6,211 @@ var sun = { x: 0, y: 0, r: 0 },
 	earth = { x: 0.5, y: 0.0, r: 0.5, th: 0, w: 0.066 },
 	mars = { x: 0.5, y: 0.0, r: 0.6, th: 0, w: 0.05 };
 var time = 0;
-var canvas, ctx, canvas2, ctx2; 
+var canvas, ctx, canvas2, ctx2;
+var GRAVITY = 6.67300e-11; // m^3 kg^-1 s^-2
+var DISTANCE_SCALE_A = 3.6e1;
+var DISTANCE_SCALE_B = 5e-9;
+var DISTANCE_SCALE_C = 5e-10;
+var SPEED_SCALE_A = 1.5e-5;
+var SPEED_SCALE_B = 1e+3;
+var SPEED_SCALE = 1e-8;
+var SIZE_SCALE_A = 6e-1;
+var SIZE_SCALE_B = 1e-20;
+function PlanetaryBody(name, color, mass, orbitRadius){
+    this.Name = name;
+    this.Color = color;
+    this.Mass = mass;
+    if(typeof orbitRadius == "undefined")
+    {
+        this.orbitRadius = 0;
+    }
+    this.orbitSpeed = 0;
+    this.orbitRadius = orbitRadius;
+
+    this.planets = [];
+}
+PlanetaryBody.prototype.addPlanet = function(planet){
+    planet.setParent(this);
+    this.planets.push(planet);
+}
+PlanetaryBody.prototype.setParent = function(parent){
+    if(this.orbitRadius > 0)
+        this.orbitSpeed = Math.sqrt(parent.Mass * GRAVITY / this.orbitRadius);
+}
+PlanetaryBody.prototype.draw = function(context, t, x, y){
+    var pos = this._calculatePos(t, x, y);
+
+    if(this.orbitRadius && this.Mass > 1){
+        context.strokeStyle = this.Color;
+        context.lineWidth = 1;
+        context.beginPath();
+        var dist = DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B);
+        //var dist = DISTANCE_SCALE_C * this.orbitRadius;
+        dist = Math.max(dist, 0);
+        context.arc(x, y, dist, 0, Math.PI * 2, true);
+        context.stroke();
+    }
+
+    this._drawSelf(context, pos.x, pos.y);
+
+    this._drawChildren(context, t, pos.x, pos.y);
+}
+PlanetaryBody.prototype._drawSelf = function(context, x, y){
+	context.fillStyle = this.Color;
+	context.beginPath();
+    var size = SIZE_SCALE_A * Math.log(this.Mass * SIZE_SCALE_B);
+    size = Math.max(size, 1);
+	context.arc(x, y, size, 0, Math.PI * 2, true);
+	context.fill();
+}
+PlanetaryBody.prototype._drawChildren = function(context, t, x, y){
+    for(var i = 0; i < this.planets.length; i++){
+        this.planets[i].draw(context, t, x, y);
+    }
+}
+PlanetaryBody.prototype._calculatePos = function(t, x, y){
+    if (this.orbitSpeed == 0.0) {
+      return {x: x, y: y};
+    } else {
+      //var angle = t * SPEED_SCALE_A * Math.log(this.orbitSpeed * SPEED_SCALE_B),
+      var angle = t * SPEED_SCALE * this.orbitSpeed,
+            dist = DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B);
+            //dist = DISTANCE_SCALE_C * this.orbitRadius;
+
+      return {
+        x: dist * Math.cos(angle) + x,
+        y: dist * Math.sin(angle) + y};
+    }
+}
+function addAsteroidBelt(body, count) {
+    var random = Math.random;
+
+    // Asteroids are generally between 2.06 and 3.27 AUs.
+    for (var i = 0; i < count; i++) {
+      var radius = (2.06 + random() * (3.27 - 2.06)) *
+      1.49597871e11; // 1 AU
+
+      body.addPlanet(
+          new PlanetaryBody("asteroid", "#777",
+              random(),
+              radius)
+        );
+    }
+}
+var sun = new PlanetaryBody("Sun", "rgb(255,196,0)", 1.989E30);
+sun.addPlanet(new PlanetaryBody("Mercury", "rgb(128,128,128)", 328.5E21, 5.79e10));
+sun.addPlanet(new PlanetaryBody("Venus", "rgb(192,128,128)", 4.867E24, 1.08e11));
+var earth = new PlanetaryBody("Earth", "rgb(40,255,40)", 5.972E24, 1.496e11);
+earth.addPlanet(new PlanetaryBody("Moon", "rgb(96,96,96)", 7.34767e22, 3.844e8));
+sun.addPlanet(earth);
+addAsteroidBelt(sun, 500);
+sun.addPlanet(new PlanetaryBody("Mars", "rgb(255,40,40)", 6.39E22, 2.279e11));
+var jupiter = new PlanetaryBody("Jupiter", "rgb(192, 192, 128)", 1.898E27, 7.78547200e11);
+jupiter.addPlanet(new PlanetaryBody("Io", "rgb(96,96,48)", 8.931900e22, 4.21700e8));
+jupiter.addPlanet(new PlanetaryBody("Europa", "rgb(96,0,48)", 4.8e22, 6.71034e8));
+jupiter.addPlanet(new PlanetaryBody("Ganymede", "rgb(96,0,48)", 1.4819e23, 1.070412e9));
+jupiter.addPlanet(new PlanetaryBody("Callisto", "rgb(96,0,128)", 1.0759e23, 1.882709e9));
+sun.addPlanet(jupiter);
+sun.addPlanet(new PlanetaryBody("Saturn", "rgb(192, 192, 128)", 568.3E24, 1.433449370e12));
+sun.addPlanet(new PlanetaryBody("Uranus", "rgb(128, 192, 192)", 86.81E24, 2.876679082e12));
+sun.addPlanet(new PlanetaryBody("Neptune", "rgb(128, 128, 192)", 102.4E24, 4.503443661e12));
 function run(){
 	init();
-	loop();
+    var d = new Date,
+        t = d.getTime();
+	loop(t);
 }
 function init(){
-	canvas = document.getElementById('canvas');  
+	canvas = document.getElementById('canvas');
 	ctx = canvas.getContext('2d');
-	canvas2 = document.getElementById('canvas2');  
+	canvas2 = document.getElementById('canvas2');
 	ctx2 = canvas2.getContext('2d');
-	canvas3 = document.getElementById('canvas3');  
-	ctx3 = canvas3.getContext('2d'); 
-	canvas4 = document.getElementById('canvas4');  
-	ctx4 = canvas4.getContext('2d'); 
+	canvas3 = document.getElementById('canvas3');
+	ctx3 = canvas3.getContext('2d');
+	canvas4 = document.getElementById('canvas4');
+	ctx4 = canvas4.getContext('2d');
 }
-function loop(){
-	physics();
-	render();
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame =
+          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+function loop(time){
+    window.requestAnimationFrame(loop);
+	physics(time);
+	render(time);
 	time++;
 	//if(time<1000)
-		setTimeout("loop()",250);
+		//setTimeout("loop()",166);
 }
 var last_time = -1;
 function physics(){
 	var delta = last_time - time;
 	last_time = time;
-	
+
 	//Sun
-	
+
 	//Mercury
 	mercury.th = (mercury.th + (mercury.w * Math.PI * delta))%(Math.PI * 2);
 	mercury.x = mercury.r * Math.cos(mercury.th);
 	mercury.y = mercury.r * Math.sin(mercury.th);
-	
+
 	//Earth
 	earth.th = (earth.th + (earth.w * Math.PI * delta))%(Math.PI * 2);
 	earth.x = earth.r * Math.cos(earth.th);
 	earth.y = earth.r * Math.sin(earth.th);
-	
+
 	//Mars
 	mars.th = (mars.th + (mars.w * Math.PI * delta))%(Math.PI * 2);
 	mars.x = mars.r * Math.cos(mars.th);
 	mars.y = mars.r * Math.sin(mars.th);
 }
-function render(){
-	
+function render(t){
+
+	width1 = canvas.width;
+	height1 = canvas.height;
+
+	o1 = { x: width1 / 2, y: height1 / 2 };
+	o1.map = map;
+
 	width = 400;
 	height = 400;
-	
+
 	o = { x: width / 2, y: height / 2 };
 	o.map = map;
-	
+
 	/*  ------------
 	 *  Heliocentric
 	*/
-	// Fade
-	ctx.fillStyle = "rgba(255,255,255,0.1)";  
-	ctx.fillRect (0, 0, width, height); 
-	
-	// Sun
-	p = o.map(sun);
-	ctx.fillStyle = "rgb(255,196,0)";
-	ctx.beginPath();
-	ctx.arc(p.x, p.y, 5, 0, Math.PI * 2, true);
-	ctx.fill();
-	// Mercury
-	p = o.map(mercury);
-	ctx.fillStyle = "rgb(128,128,40)";
-	ctx.beginPath();
-	ctx.arc(p.x, p.y, 2, 0, Math.PI * 2, true);
-	ctx.fill();
-	// Earth
-	p = o.map(earth);
-	ctx.fillStyle = "rgb(40,255,40)";
-	ctx.beginPath();
-	ctx.arc(p.x, p.y, 2, 0, Math.PI * 2, true);
-	ctx.fill();
-	// Mars
-	p = o.map(mars);
-	ctx.fillStyle = "rgb(255,40,40)";
-	ctx.beginPath();
-	ctx.arc(p.x, p.y, 2, 0, Math.PI * 2, true);
-	ctx.fill();
-	
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillRect (0, 0, width1, height1);
+	sun.draw(ctx, t, o1.x, o1.y)
+
 	/* ---------------
 	 * Earth-centric
 	 * ---------------*/
 	// Fade
-	ctx2.fillStyle = "rgba(255,255,255,0.1)";  
-	ctx2.fillRect (0, 0, width, height); 
+	ctx2.fillStyle = "rgba(255,255,255,0.1)";
+	ctx2.fillRect (0, 0, width, height);
 	// Earth
 	ctx2.fillStyle = "rgb(40,255,40)";
 	ctx2.beginPath();
@@ -134,13 +249,13 @@ function render(){
 	ctx2.beginPath();
 	ctx2.arc(x, y, 2, 0, Math.PI * 2, true);
 	ctx2.fill();
-	
+
 	/* ---------------
 	 * Mars-centric
 	 * ---------------*/
 	// Fade
-	ctx3.fillStyle = "rgba(255,255,255,0.1)";  
-	ctx3.fillRect (0, 0, width, height); 
+	ctx3.fillStyle = "rgba(255,255,255,0.1)";
+	ctx3.fillRect (0, 0, width, height);
 	// Mars
 	ctx3.fillStyle = "rgb(255,40,40)";
 	ctx3.beginPath();
@@ -179,13 +294,13 @@ function render(){
 	ctx3.beginPath();
 	ctx3.arc(x, y, 2, 0, Math.PI * 2, true);
 	ctx3.fill();
-	
+
 	/* ---------------
 	 * Mercury-centric
 	 * ---------------*/
 	// Fade
-	ctx4.fillStyle = "rgba(255,255,255,0.1)";  
-	ctx4.fillRect (0, 0, width, height); 
+	ctx4.fillStyle = "rgba(255,255,255,0.1)";
+	ctx4.fillRect (0, 0, width, height);
 	// Mercury
 	ctx4.fillStyle = "rgb(128,128,40)";
 	ctx4.beginPath();
@@ -231,7 +346,7 @@ function dir(a,b){return Math.atan2((a.x - b.x),(a.y - b.y));}
 </script>
 </head>
 <body onload="run()">
-<canvas id="canvas" width="400" height="400" style="border: 1px solid black;"></canvas>
+<canvas id="canvas" width="1300" height="800" style="border: 1px solid black;"></canvas>
 <canvas id="canvas2" width="400" height="400" style="border: 1px solid black;"></canvas>
 <canvas id="canvas3" width="400" height="400" style="border: 1px solid black;"></canvas>
 <canvas id="canvas4" width="400" height="400" style="border: 1px solid black;"></canvas>
