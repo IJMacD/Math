@@ -2,9 +2,9 @@
 <head>
 <script>
 var sun = { x: 0, y: 0, r: 0 },
-	mercury = { x: 0.5, y: 0.0, r: 0.2, th: 0, w: 0.09 },
-	earth = { x: 0.5, y: 0.0, r: 0.5, th: 0, w: 0.066 },
-	mars = { x: 0.5, y: 0.0, r: 0.6, th: 0, w: 0.05 };
+    mercury = { x: 0.5, y: 0.0, r: 0.2, th: 0, w: 0.09 },
+    earth = { x: 0.5, y: 0.0, r: 0.5, th: 0, w: 0.066 },
+    mars = { x: 0.5, y: 0.0, r: 0.6, th: 0, w: 0.05 };
 var time = 0;
 var canvas, ctx, canvas2, ctx2;
 var GRAVITY = 6.67300e-11; // m^3 kg^-1 s^-2
@@ -60,8 +60,8 @@ PlanetaryBody.prototype._drawSelf = function(context, x, y){
 	context.beginPath();
     var size = SIZE_SCALE_A * Math.log(this.Mass * SIZE_SCALE_B);
     size = Math.max(size, 1);
-	context.arc(x, y, size, 0, Math.PI * 2, true);
-	context.fill();
+    context.arc(x, y, size, 0, Math.PI * 2, true);
+    context.fill();
 }
 PlanetaryBody.prototype._drawChildren = function(context, t, x, y){
     for(var i = 0; i < this.planets.length; i++){
@@ -115,20 +115,20 @@ sun.addPlanet(new PlanetaryBody("Saturn", "rgb(192, 192, 128)", 568.3E24, 1.4334
 sun.addPlanet(new PlanetaryBody("Uranus", "rgb(128, 192, 192)", 86.81E24, 2.876679082e12));
 sun.addPlanet(new PlanetaryBody("Neptune", "rgb(128, 128, 192)", 102.4E24, 4.503443661e12));
 function run(){
-	init();
+    init();
     var d = new Date,
         t = d.getTime();
-	loop(t);
+    loop(t);
 }
 function init(){
-	canvas = document.getElementById('canvas');
-	ctx = canvas.getContext('2d');
-	canvas2 = document.getElementById('canvas2');
-	ctx2 = canvas2.getContext('2d');
-	canvas3 = document.getElementById('canvas3');
-	ctx3 = canvas3.getContext('2d');
-	canvas4 = document.getElementById('canvas4');
-	ctx4 = canvas4.getContext('2d');
+    canvas = document.getElementById('canvas');
+    ctx = canvas.getContext('2d');
+    canvas2 = document.getElementById('canvas2');
+    ctx2 = canvas2.getContext('2d');
+    canvas3 = document.getElementById('canvas3');
+    ctx3 = canvas3.getContext('2d');
+    canvas4 = document.getElementById('canvas4');
+    ctx4 = canvas4.getContext('2d');
 }
 (function() {
     var lastTime = 0;
@@ -156,189 +156,189 @@ function init(){
 }());
 function loop(time){
     window.requestAnimationFrame(loop);
-	physics(time);
-	render(time);
-	time++;
-	//if(time<1000)
-		//setTimeout("loop()",166);
+    physics(time);
+    render(time);
+    time++;
+    //if(time<1000)
+        //setTimeout("loop()",166);
 }
 var last_time = -1;
 function physics(){
-	var delta = last_time - time;
-	last_time = time;
+    var delta = last_time - time;
+    last_time = time;
 
-	//Sun
+    //Sun
 
-	//Mercury
-	mercury.th = (mercury.th + (mercury.w * Math.PI * delta))%(Math.PI * 2);
-	mercury.x = mercury.r * Math.cos(mercury.th);
-	mercury.y = mercury.r * Math.sin(mercury.th);
+    //Mercury
+    mercury.th = (mercury.th + (mercury.w * Math.PI * delta))%(Math.PI * 2);
+    mercury.x = mercury.r * Math.cos(mercury.th);
+    mercury.y = mercury.r * Math.sin(mercury.th);
 
-	//Earth
-	earth.th = (earth.th + (earth.w * Math.PI * delta))%(Math.PI * 2);
-	earth.x = earth.r * Math.cos(earth.th);
-	earth.y = earth.r * Math.sin(earth.th);
+    //Earth
+    earth.th = (earth.th + (earth.w * Math.PI * delta))%(Math.PI * 2);
+    earth.x = earth.r * Math.cos(earth.th);
+    earth.y = earth.r * Math.sin(earth.th);
 
-	//Mars
-	mars.th = (mars.th + (mars.w * Math.PI * delta))%(Math.PI * 2);
-	mars.x = mars.r * Math.cos(mars.th);
-	mars.y = mars.r * Math.sin(mars.th);
+    //Mars
+    mars.th = (mars.th + (mars.w * Math.PI * delta))%(Math.PI * 2);
+    mars.x = mars.r * Math.cos(mars.th);
+    mars.y = mars.r * Math.sin(mars.th);
 }
 function render(t){
 
-	width1 = canvas.width;
-	height1 = canvas.height;
+    width1 = canvas.width;
+    height1 = canvas.height;
 
-	o1 = { x: width1 / 2, y: height1 / 2 };
-	o1.map = map;
+    o1 = { x: width1 / 2, y: height1 / 2 };
+    o1.map = map;
 
-	width = 400;
-	height = 400;
+    width = 400;
+    height = 400;
 
-	o = { x: width / 2, y: height / 2 };
-	o.map = map;
+    o = { x: width / 2, y: height / 2 };
+    o.map = map;
 
-	/*  ------------
-	 *  Heliocentric
-	*/
-	ctx.fillStyle = "rgb(255,255,255)";
-	ctx.fillRect (0, 0, width1, height1);
-	sun.draw(ctx, t, o1.x, o1.y)
+    /*  ------------
+     *  Heliocentric
+    */
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillRect (0, 0, width1, height1);
+    sun.draw(ctx, t, o1.x, o1.y)
 
-	/* ---------------
-	 * Earth-centric
-	 * ---------------*/
-	// Fade
-	ctx2.fillStyle = "rgba(255,255,255,0.1)";
-	ctx2.fillRect (0, 0, width, height);
-	// Earth
-	ctx2.fillStyle = "rgb(40,255,40)";
-	ctx2.beginPath();
-	ctx2.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
-	ctx2.fill();
-	// Sun
-	d = mag(earth,sun);
-	a = dir(earth,sun);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx2.fillStyle = "rgb(255,196,0)";
-	ctx2.beginPath();
-	ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
-	ctx2.fill();
-	// Mercury
-	d = mag(earth,mercury);
-	a = dir(earth,mercury);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx2.fillStyle = "rgb(128,128,40)";
-	ctx2.beginPath();
-	ctx2.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx2.fill();
-	// Mars
-	d = mag(earth,mars);
-	a = dir(earth,mars);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx2.fillStyle = "rgb(255,40,40)";
-	ctx2.beginPath();
-	ctx2.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx2.fill();
+    /* ---------------
+     * Earth-centric
+     * ---------------*/
+    // Fade
+    ctx2.fillStyle = "rgba(255,255,255,0.1)";
+    ctx2.fillRect (0, 0, width, height);
+    // Earth
+    ctx2.fillStyle = "rgb(40,255,40)";
+    ctx2.beginPath();
+    ctx2.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
+    ctx2.fill();
+    // Sun
+    d = mag(earth,sun);
+    a = dir(earth,sun);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx2.fillStyle = "rgb(255,196,0)";
+    ctx2.beginPath();
+    ctx2.arc(x, y, 5, 0, Math.PI * 2, true);
+    ctx2.fill();
+    // Mercury
+    d = mag(earth,mercury);
+    a = dir(earth,mercury);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx2.fillStyle = "rgb(128,128,40)";
+    ctx2.beginPath();
+    ctx2.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx2.fill();
+    // Mars
+    d = mag(earth,mars);
+    a = dir(earth,mars);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx2.fillStyle = "rgb(255,40,40)";
+    ctx2.beginPath();
+    ctx2.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx2.fill();
 
-	/* ---------------
-	 * Mars-centric
-	 * ---------------*/
-	// Fade
-	ctx3.fillStyle = "rgba(255,255,255,0.1)";
-	ctx3.fillRect (0, 0, width, height);
-	// Mars
-	ctx3.fillStyle = "rgb(255,40,40)";
-	ctx3.beginPath();
-	ctx3.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
-	ctx3.fill();
-	// Sun
-	d = mag(mars,sun);
-	a = dir(mars,sun);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx3.fillStyle = "rgb(255,196,0)";
-	ctx3.beginPath();
-	ctx3.arc(x, y, 5, 0, Math.PI * 2, true);
-	ctx3.fill();
-	// Earth
-	d = mag(mars,earth);
-	a = dir(mars,earth);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx3.fillStyle = "rgb(40,255,40)";
-	ctx3.beginPath();
-	ctx3.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx3.fill();
-	// Mercury
-	d = mag(mars,mercury);
-	a = dir(mars,mercury);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx3.fillStyle = "rgb(128,128,40)";
-	ctx3.beginPath();
-	ctx3.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx3.fill();
+    /* ---------------
+     * Mars-centric
+     * ---------------*/
+    // Fade
+    ctx3.fillStyle = "rgba(255,255,255,0.1)";
+    ctx3.fillRect (0, 0, width, height);
+    // Mars
+    ctx3.fillStyle = "rgb(255,40,40)";
+    ctx3.beginPath();
+    ctx3.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
+    ctx3.fill();
+    // Sun
+    d = mag(mars,sun);
+    a = dir(mars,sun);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx3.fillStyle = "rgb(255,196,0)";
+    ctx3.beginPath();
+    ctx3.arc(x, y, 5, 0, Math.PI * 2, true);
+    ctx3.fill();
+    // Earth
+    d = mag(mars,earth);
+    a = dir(mars,earth);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx3.fillStyle = "rgb(40,255,40)";
+    ctx3.beginPath();
+    ctx3.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx3.fill();
+    // Mercury
+    d = mag(mars,mercury);
+    a = dir(mars,mercury);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx3.fillStyle = "rgb(128,128,40)";
+    ctx3.beginPath();
+    ctx3.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx3.fill();
 
-	/* ---------------
-	 * Mercury-centric
-	 * ---------------*/
-	// Fade
-	ctx4.fillStyle = "rgba(255,255,255,0.1)";
-	ctx4.fillRect (0, 0, width, height);
-	// Mercury
-	ctx4.fillStyle = "rgb(128,128,40)";
-	ctx4.beginPath();
-	ctx4.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
-	ctx4.fill();
-	// Sun
-	d = mag(mercury,sun);
-	a = dir(mercury,sun);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx4.fillStyle = "rgb(255,196,0)";
-	ctx4.beginPath();
-	ctx4.arc(x, y, 5, 0, Math.PI * 2, true);
-	ctx4.fill();
-	// Earth
-	d = mag(mercury,earth);
-	a = dir(mercury,earth);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx4.fillStyle = "rgb(40,255,40)";
-	ctx4.beginPath();
-	ctx4.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx4.fill();
-	// Mars
-	d = mag(mercury,mars);
-	a = dir(mercury,mars);
-	x = d * Math.cos(a);
-	y = d * Math.sin(a);
-	x = o.x+(x*o.x);
-	y = o.y-(y*o.y);
-	ctx4.fillStyle = "rgb(255,40,40)";
-	ctx4.beginPath();
-	ctx4.arc(x, y, 2, 0, Math.PI * 2, true);
-	ctx4.fill();
+    /* ---------------
+     * Mercury-centric
+     * ---------------*/
+    // Fade
+    ctx4.fillStyle = "rgba(255,255,255,0.1)";
+    ctx4.fillRect (0, 0, width, height);
+    // Mercury
+    ctx4.fillStyle = "rgb(128,128,40)";
+    ctx4.beginPath();
+    ctx4.arc(o.x, o.y, 2, 0, Math.PI * 2, true);
+    ctx4.fill();
+    // Sun
+    d = mag(mercury,sun);
+    a = dir(mercury,sun);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx4.fillStyle = "rgb(255,196,0)";
+    ctx4.beginPath();
+    ctx4.arc(x, y, 5, 0, Math.PI * 2, true);
+    ctx4.fill();
+    // Earth
+    d = mag(mercury,earth);
+    a = dir(mercury,earth);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx4.fillStyle = "rgb(40,255,40)";
+    ctx4.beginPath();
+    ctx4.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx4.fill();
+    // Mars
+    d = mag(mercury,mars);
+    a = dir(mercury,mars);
+    x = d * Math.cos(a);
+    y = d * Math.sin(a);
+    x = o.x+(x*o.x);
+    y = o.y-(y*o.y);
+    ctx4.fillStyle = "rgb(255,40,40)";
+    ctx4.beginPath();
+    ctx4.arc(x, y, 2, 0, Math.PI * 2, true);
+    ctx4.fill();
 }
 function map(i){return{x:this.x+(i.x*this.x),y:this.y-(i.y*this.y)};}
 function mag(a,b){return Math.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));}
