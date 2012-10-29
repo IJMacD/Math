@@ -204,7 +204,7 @@ function addKuiperBelt(body, count) {
     }
 }
 function drawEllipse(ctx, x, y, w, h) {
-  var kappa = .5522848;
+  var kappa = .5522848,
       ox = (w / 2) * kappa, // control point offset horizontal
       oy = (h / 2) * kappa, // control point offset vertical
       xe = x + w / 2,       // x-end
@@ -246,6 +246,7 @@ function run(){
     init();
     var d = new Date,
         t = d.getTime();
+    startTime = t;
     loop(t);
 }
 function init(){
@@ -290,6 +291,7 @@ function init(){
         };
 }());
 function loop(time){
+    time = time + startTime;
     window.requestAnimationFrame(loop);
     physics(time);
     render(time);
@@ -487,7 +489,7 @@ Distance:
 <label for="dist_log_rad">Logaritmic</label>
 <input type="radio" id="dist_lin_rad" name="dist_scale" value="lin" checked>
 <label for="dist_lin_rad">Linear</label>
-<input type="range" id="dist_lin_rng" value="-10" min="-11" max="-6" step="0.01" style="width:800px"><br>
+<input type="range" id="dist_lin_rng" value="-9.3" min="-11" max="-6" step="0.01" style="width:800px"><br>
 Speed:
 <input type="radio" id="spd_log_rad" name="spd_scale" value="log">
 <label for="spd_log_rad">Logaritmic</label>
