@@ -21,12 +21,23 @@ function PlanetaryBody(name, color, mass, orbitRadius){
     this.Name = name;
     this.Color = color;
     this.Mass = mass;
+    this.orbitPeriod = 0;
+    this.Ellipse = false;
     if(typeof orbitRadius == "undefined")
-    {
         this.orbitRadius = 0;
+    else if(orbitRadius instanceof Array)
+    {
+        this.perihelion = orbitRadius[0];
+        this.aphelion = orbitRadius[1];
+        this.orbitRadius = (this.perihelion + this.aphelion) / 2;
+        this.f = this.orbitRadius - this.perihelion;
+        this.b = Math.sqrt(this.orbitRadius * this.perihelion);
+        this.semiLatus = this.b * this.b / this.orbitRadius;
+        this.eccentricity = this.f / this.orbitRadius;
+        this.ellipse = true;
     }
-    this.orbitSpeed = 0;
-    this.orbitRadius = orbitRadius;
+    else
+        this.orbitRadius = orbitRadius;
 
     this.planets = [];
 }
@@ -36,7 +47,7 @@ PlanetaryBody.prototype.addPlanet = function(planet){
 }
 PlanetaryBody.prototype.setParent = function(parent){
     if(this.orbitRadius > 0)
-        this.orbitSpeed = Math.sqrt(parent.Mass * GRAVITY / this.orbitRadius);
+        this.orbitPeriod = Math.sqrt(4 * Math.PI * Math.PI * this.orbitRadius * this.orbitRadius * this.orbitRadius / parent.Mass / GRAVITY);
 }
 PlanetaryBody.prototype.draw = function(context, t, x, y){
     var pos = this._calculatePos(t, x, y);
@@ -44,26 +55,68 @@ PlanetaryBody.prototype.draw = function(context, t, x, y){
     if(this.orbitRadius && this.Mass > 1){
         context.strokeStyle = this.Color;
         context.lineWidth = 1;
-        context.beginPath();
         var dist = (distScaleRadio.checked) ?
             DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B) :
             DISTANCE_SCALE * this.orbitRadius;
         dist = Math.max(dist, 0);
-        context.arc(x, y, dist, 0, Math.PI * 2, true);
-        context.stroke();
+        if(this.ellipse){
+            //var fx = (distScaleRadio.checked) ?
+            //    x - DISTANCE_SCALE_A * Math.log(this.f * DISTANCE_SCALE_B) :
+            var    fx = x - DISTANCE_SCALE * this.f,
+            //    fy = (distScaleRadio.checked) ?
+            //    y - DISTANCE_SCALE_A * Math.log(this.f * DISTANCE_SCALE_B) :
+                fy =    y,
+                b = (distScaleRadio.checked) ?
+            DISTANCE_SCALE_A * Math.log(this.b * DISTANCE_SCALE_B) :
+            DISTANCE_SCALE * this.b;
+            drawEllipse(context, fx, fy, dist * 2, b * 2);
+        }
+        else
+        {
+            context.beginPath();
+            context.arc(x, y, dist, 0, Math.PI * 2, true);
+            context.stroke();
+        }
+
+        if(debugCheck.checked)
+            context.strokeText(this.orbitRadius.toPrecision(2), pos.x + 10, pos.y + 10);
     }
+
 
     this._drawSelf(context, pos.x, pos.y);
 
     this._drawChildren(context, t, pos.x, pos.y);
 }
 PlanetaryBody.prototype._drawSelf = function(context, x, y){
-	context.fillStyle = this.Color;
-	context.beginPath();
+    context.lineWidth = 0.5;
+    context.fillStyle = this.Color;
+    context.strokeStyle = this.Color;
+
     var size = SIZE_SCALE_A * Math.log(this.Mass * SIZE_SCALE_B);
     size = Math.max(size, 1);
+
+    if (size >= 2.0) {
+        context.shadowOffsetX = 2;
+        context.shadowOffsetY = 2;
+        context.shadowBlur = 2;
+        context.shadowColor = "#ddd";
+    }
+
+    context.beginPath();
     context.arc(x, y, size, 0, Math.PI * 2, true);
     context.fill();
+    context.closePath();
+    context.stroke();
+
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+    context.shadowBlur = 0;
+
+    context.beginPath();
+    context.arc(x, y, size, 0, Math.PI * 2, true);
+    context.fill();
+    context.closePath();
+    context.stroke();
 }
 PlanetaryBody.prototype._drawChildren = function(context, t, x, y){
     for(var i = 0; i < this.planets.length; i++){
@@ -71,7 +124,7 @@ PlanetaryBody.prototype._drawChildren = function(context, t, x, y){
     }
 }
 PlanetaryBody.prototype._calculatePos = function(t, x, y){
-    if (this.orbitSpeed == 0.0) {
+    if (this.orbitPeriod == 0.0) {
       return {x: x, y: y};
     } else {
 
@@ -104,15 +157,35 @@ function addAsteroidBelt(body, count) {
         );
     }
 }
+function drawEllipse(ctx, x, y, w, h) {
+  var kappa = .5522848;
+      ox = (w / 2) * kappa, // control point offset horizontal
+      oy = (h / 2) * kappa, // control point offset vertical
+      xe = x + w / 2,       // x-end
+      ye = y + h / 2,       // y-end
+      xm = x,               // x-middle
+      ym = y,               // y-middle
+      x = x - w / 2,
+      y = y - h / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(x, ym);
+  ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+  ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+  ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+  ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+  ctx.closePath();
+  ctx.stroke();
+}
 var sun = new PlanetaryBody("Sun", "rgb(255,196,0)", 1.989E30);
-sun.addPlanet(new PlanetaryBody("Mercury", "rgb(128,128,128)", 328.5E21, 5.79e10));
-sun.addPlanet(new PlanetaryBody("Venus", "rgb(192,128,128)", 4.867E24, 1.08e11));
-var earth = new PlanetaryBody("Earth", "rgb(40,255,40)", 5.972E24, 1.496e11);
+sun.addPlanet(new PlanetaryBody("Mercury", "rgb(128,128,128)", 328.5E21, [4.60012e10,6.98169e10]));
+sun.addPlanet(new PlanetaryBody("Venus", "rgb(192,128,128)", 4.867E24, [1.07477e11,1.08939e11]));
+var earth = new PlanetaryBody("Earth", "rgb(40,255,40)", 5.972E24, [1.47098290e11,1.52098232e11]);
 earth.addPlanet(new PlanetaryBody("Moon", "rgb(96,96,96)", 7.34767e22, 3.844e8));
 sun.addPlanet(earth);
 addAsteroidBelt(sun, 500);
-sun.addPlanet(new PlanetaryBody("Mars", "rgb(255,40,40)", 6.39E22, 2.279e11));
-var jupiter = new PlanetaryBody("Jupiter", "rgb(192, 192, 128)", 1.898E27, 7.78547200e11);
+sun.addPlanet(new PlanetaryBody("Mars", "rgb(255,40,40)", 6.39E22, [2.06669e11,2.492093e11]));
+var jupiter = new PlanetaryBody("Jupiter", "rgb(192, 192, 128)", 1.898E27, [7.405736e11,8.165208e11]);
 jupiter.addPlanet(new PlanetaryBody("Io", "rgb(96,96,48)", 8.931900e22, 4.21700e8));
 jupiter.addPlanet(new PlanetaryBody("Europa", "rgb(96,0,48)", 4.8e22, 6.71034e8));
 jupiter.addPlanet(new PlanetaryBody("Ganymede", "rgb(96,0,48)", 1.4819e23, 1.070412e9));
