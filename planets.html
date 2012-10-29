@@ -143,17 +143,49 @@ PlanetaryBody.prototype._calculatePos = function(t, x, y){
     }
 }
 function addAsteroidBelt(body, count) {
-    var random = Math.random;
-
+    // Normal dist between -1 and 1
+    var random = function(sd, mean){
+        var r = (Math.random() + Math.random() + Math.random())*2/3 - 1;
+        if(typeof sd != "undefined" &&
+            typeof mean != "undefined")
+            r = sd * r + mean;
+        return r;
+    }
     // Asteroids are generally between 2.06 and 3.27 AUs.
     for (var i = 0; i < count; i++) {
-      var radius = (2.06 + random() * (3.27 - 2.06)) *
+      var radius = (2.06 + Math.random() * (3.27 - 2.06)) *
       1.49597871e11; // 1 AU
 
       body.addPlanet(
           new PlanetaryBody("asteroid", "#777",
               random(),
               radius)
+        );
+    }
+}
+function addKuiperBelt(body, count) {
+    // Normal dist between -1 and 1
+    var random = function(sd, mean){
+        var d=10, r=0, i=0;
+        for(;i<d;i++)
+            r += Math.random();
+        r = r / d * 2 - 1;
+        if(typeof sd != "undefined" &&
+            typeof mean != "undefined")
+            r = sd * r + mean;
+        return r;
+    }
+    // Asteroids are generally between 2.06 and 3.27 AUs.
+    for (var i = 0; i < count; i++) {
+      var radius1 = random(15, 40) *
+      1.49597871e11,
+        radius2 = random(15, 40) *
+      1.49597871e11; // 1 AU
+
+      body.addPlanet(
+          new PlanetaryBody("asteroid", "#777",
+              Math.random(),
+              [radius1, radius2])
         );
     }
 }
@@ -194,6 +226,7 @@ sun.addPlanet(jupiter);
 sun.addPlanet(new PlanetaryBody("Saturn", "rgb(192, 192, 128)", 568.3E24, 1.433449370e12));
 sun.addPlanet(new PlanetaryBody("Uranus", "rgb(128, 192, 192)", 86.81E24, 2.876679082e12));
 sun.addPlanet(new PlanetaryBody("Neptune", "rgb(128, 128, 192)", 102.4E24, 4.503443661e12));
+addKuiperBelt(sun, 500);
 function run(){
     init();
     var d = new Date,
