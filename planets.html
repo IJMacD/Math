@@ -13,7 +13,7 @@ var DISTANCE_SCALE_B = 5e-9;
 var DISTANCE_SCALE = 5e-10;
 var SPEED_SCALE_A = 2e-5;
 var SPEED_SCALE_B = 1.1e10
-var SPEED_SCALE = 1e3;
+var SPEED_SCALE = 1e2;
 var SIZE_SCALE_A = 6e-1;
 var SIZE_SCALE_B = 1e-20;
 function PlanetaryBody(name, color, mass, orbitRadius){
@@ -141,9 +141,17 @@ PlanetaryBody.prototype._calculatePos = function(t, x, y){
     if (this.orbitPeriod == 0.0) {
       return {x: x, y: y};
     } else {
-
+        //http://answers.yahoo.com/question/index?qid=20060912181938AAvLbmv
+        // Currently sun is at wrong focus!
+        var M = Math.sqrt(GRAVITY * this.parent.Mass / this.orbitRadius / this.orbitRadius / this.orbitRadius) * t,
+            E = M,
+            e = this.ellipse ? this.eccentricity : 0;
+        for(var i = 0; i < 10; i++)
+        {
+            E = M + e * Math.sin(E);
+        }
       var angle = (spdScaleRadio.checked) ? t * SPEED_SCALE_A * Math.log( SPEED_SCALE_B / this.orbitPeriod) :
-            t * SPEED_SCALE / this.orbitPeriod,
+            2 * Math.atan(Math.sqrt((1+e)/(1-e))*Math.tan(E/2)) * SPEED_SCALE,
         // ellipse:
         // r = p / (1 + e cos(th) )
             radius = this.ellipse ? this.semiLatus / (1 + this.eccentricity * Math.cos(angle) ) : this.orbitRadius,
