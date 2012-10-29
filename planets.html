@@ -7,13 +7,14 @@ var sun = { x: 0, y: 0, r: 0 },
     mars = { x: 0.5, y: 0.0, r: 0.6, th: 0, w: 0.05 };
 var time = 0;
 var canvas, ctx, canvas2, ctx2;
+var distScaleRadio, spdScaleRadio, debugCheck;
 var GRAVITY = 6.67300e-11; // m^3 kg^-1 s^-2
 var DISTANCE_SCALE_A = 3.6e1;
 var DISTANCE_SCALE_B = 5e-9;
-var DISTANCE_SCALE_C = 5e-10;
-var SPEED_SCALE_A = 1.5e-5;
-var SPEED_SCALE_B = 1e+3;
-var SPEED_SCALE = 1e-8;
+var DISTANCE_SCALE = 5e-10;
+var SPEED_SCALE_A = 2e-5;
+var SPEED_SCALE_B = 1.1e10
+var SPEED_SCALE = 1e-6;
 var SIZE_SCALE_A = 6e-1;
 var SIZE_SCALE_B = 1e-20;
 function PlanetaryBody(name, color, mass, orbitRadius){
@@ -44,8 +45,9 @@ PlanetaryBody.prototype.draw = function(context, t, x, y){
         context.strokeStyle = this.Color;
         context.lineWidth = 1;
         context.beginPath();
-        var dist = DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B);
-        //var dist = DISTANCE_SCALE_C * this.orbitRadius;
+        var dist = (distScaleRadio.checked) ?
+            DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B) :
+            DISTANCE_SCALE * this.orbitRadius;
         dist = Math.max(dist, 0);
         context.arc(x, y, dist, 0, Math.PI * 2, true);
         context.stroke();
@@ -72,10 +74,15 @@ PlanetaryBody.prototype._calculatePos = function(t, x, y){
     if (this.orbitSpeed == 0.0) {
       return {x: x, y: y};
     } else {
-      //var angle = t * SPEED_SCALE_A * Math.log(this.orbitSpeed * SPEED_SCALE_B),
-      var angle = t * SPEED_SCALE * this.orbitSpeed,
-            dist = DISTANCE_SCALE_A * Math.log(this.orbitRadius * DISTANCE_SCALE_B);
-            //dist = DISTANCE_SCALE_C * this.orbitRadius;
+
+      var angle = (spdScaleRadio.checked) ? t * SPEED_SCALE_A * Math.log( SPEED_SCALE_B / this.orbitPeriod) :
+            t * SPEED_SCALE / this.orbitPeriod,
+        // ellipse:
+        // r = p / (1 + e cos(th) )
+            radius = this.ellipse ? this.semiLatus / (1 + this.eccentricity * Math.cos(angle) ) : this.orbitRadius,
+        dist = (distScaleRadio.checked) ?
+            DISTANCE_SCALE_A * Math.log(radius * DISTANCE_SCALE_B) :
+            DISTANCE_SCALE * radius;
 
       return {
         x: dist * Math.cos(angle) + x,
@@ -121,6 +128,13 @@ function run(){
     loop(t);
 }
 function init(){
+    distScaleRadio = document.getElementById('dist_log_rad');
+    spdScaleRadio = document.getElementById('spd_log_rad');
+    debugCheck = document.getElementById('debug_chk');
+    distScaleRange = document.getElementById('dist_lin_rng');
+    distScaleRange.onclick = function(event){
+        DISTANCE_SCALE = event.target.value;
+    };
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
     canvas2 = document.getElementById('canvas2');
@@ -346,6 +360,20 @@ function dir(a,b){return Math.atan2((a.x - b.x),(a.y - b.y));}
 </script>
 </head>
 <body onload="run()">
+Distance:
+<input type="radio" id="dist_log_rad" name="dist_scale" value="log" checked>
+<label for="dist_log_rad">Logaritmic</label>
+<input type="radio" id="dist_lin_rad" name="dist_scale" value="lin">
+<label for="dist_lin_rad">Linear</label>
+<input type="range" id="dist_lin_rng" value="5e-10" min="1e-11" max="1e-9" step="1e-11" style="width:200px"><br>
+Speed:
+<input type="radio" id="spd_log_rad" name="spd_scale" value="log" checked>
+<label for="spd_log_rad">Logaritmic</label>
+<input type="radio" id="spd_lin_rad" name="spd_scale" value="lin">
+<label for="spd_lin_rad">Linear</label><br>
+Debug:
+<input type="checkbox" id="debug_chk" name="debug">
+<label for="debug_chk">Debug</label>
 <canvas id="canvas" width="1300" height="800" style="border: 1px solid black;"></canvas>
 <canvas id="canvas2" width="400" height="400" style="border: 1px solid black;"></canvas>
 <canvas id="canvas3" width="400" height="400" style="border: 1px solid black;"></canvas>
