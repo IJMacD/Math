@@ -22,6 +22,9 @@ function PlanetaryBody(name, color, mass, orbitRadius){
     this.Mass = mass;
     this.orbitPeriod = 0;
     this.Ellipse = false;
+    this.Path = [];
+    this.frame = 0;
+    this.pathLength = 1000;
     if(typeof orbitRadius == "undefined")
         this.orbitRadius = 0;
     else if(orbitRadius instanceof Array)
@@ -66,6 +69,9 @@ PlanetaryBody.prototype.draw = function(context, t, x, y){
 PlanetaryBody.prototype._draw = function(context, t, x, y){
     var pos = this._calculatePos(t, x, y);
 
+    var index = this.frame % this.pathLength;
+    this.Path[index] = pos;
+
     if(this.orbitRadius && this.Mass > 1){
         context.strokeStyle = this.Color;
         context.lineWidth = 1;
@@ -74,16 +80,13 @@ PlanetaryBody.prototype._draw = function(context, t, x, y){
             DISTANCE_SCALE * this.orbitRadius;
         dist = Math.max(dist, 0);
         if(this.ellipse){
-            var fx = (distScaleRadio.checked) ?
-                x :
-                x - DISTANCE_SCALE * this.f,
-            //    fy = (distScaleRadio.checked) ?
-            //    y - DISTANCE_SCALE_A * Math.log(this.f * DISTANCE_SCALE_B) :
-                fy =    y,
-                b = (distScaleRadio.checked) ?
-            DISTANCE_SCALE_A * Math.log(this.b * DISTANCE_SCALE_B) :
-            DISTANCE_SCALE * this.b;
-            drawEllipse(context, fx, fy, dist * 1.85, b * 1.85);
+            context.beginPath();
+            context.moveTo(this.Path[index].x, this.Path[index].y);
+            for(var i = this.Path.length; i > 0; i--) {
+                var j = (i + index) % this.Path.length;
+                context.lineTo(this.Path[j].x, this.Path[j].y);
+            }
+            context.stroke();
         }
         else
         {
@@ -95,6 +98,7 @@ PlanetaryBody.prototype._draw = function(context, t, x, y){
         if(debugCheck.checked)
             context.strokeText(this.orbitRadius.toPrecision(2), pos.x + 10, pos.y + 10);
     }
+    this.frame++;
 
 
     this._drawSelf(context, pos.x, pos.y);
@@ -255,7 +259,7 @@ function run(){
     var d = new Date,
         t = d.getTime();
     startTime = t;
-    loop(t);
+    loop(0);
 }
 function init(){
     distScaleRadio = document.getElementById('dist_log_rad');
