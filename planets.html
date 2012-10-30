@@ -13,7 +13,7 @@ var DISTANCE_SCALE_B = 5e-9;
 var DISTANCE_SCALE = 5e-10;
 var SPEED_SCALE_A = 2e-5;
 var SPEED_SCALE_B = 1.1e10
-var SPEED_SCALE = 1e2;
+var SPEED_SCALE = 1e3;
 var SIZE_SCALE_A = 6e-1;
 var SIZE_SCALE_B = 1e-20;
 function PlanetaryBody(name, color, mass, orbitRadius){
@@ -160,8 +160,8 @@ PlanetaryBody.prototype._calculatePos = function(t, x, y){
             DISTANCE_SCALE * radius;
 
       return {
-        x: dist * Math.cos(angle) + x,
-        y: dist * Math.sin(angle) + y};
+        x: x + dist * Math.cos(angle),
+        y: y + dist * Math.sin(angle)};
     }
 }
 function addAsteroidBelt(body, count) {
