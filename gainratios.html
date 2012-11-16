@@ -1,16 +1,18 @@
+<!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Bike Gain Ratios</title>
 <link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap.min.css">
 <style>
 body {
   font-family: sans-serif;
 }
+canvas {
+  width: 100%;
+}
 h3 {
   margin-bottom: 0
-}
-input[type=text] {
-  height: 30px;
 }
 #addbike_modal a {
   font-size: .8em;
@@ -44,15 +46,17 @@ input[type=text] {
 </style>
 </head>
 <body>
-<h1>Gain Ratios</h1>
-<canvas width="1000" height="350"></canvas>
-<h2>Bikes:</h2>
-<ul id="bike_lst"></ul>
-<a href="#addbike_modal" role="button" class="btn" data-toggle="modal">Add Bike</a>
+<div class="container">
+  <h1>Gain Ratios</h1>
+  <canvas width="800" height="400"></canvas>
+  <h2>Bikes:</h2>
+  <ul id="bike_lst"></ul>
+  <a href="#addbike_modal" role="button" class="btn" data-toggle="modal">Add Bike</a>
+</div>
 
 <div id="addbike_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addbike_modal_lbl" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="addbike_modal_lbl">Choose Bike Options</h3>
   </div>
   <div class="modal-body">
@@ -92,19 +96,19 @@ input[type=text] {
       <a href="#customSprocket">custom</a><br>
       <label for="wheelsize_slt">Wheel Size</label>
       <select id="wheelsize_slt">
-        <option value="622">700C</option>
-        <option value="557">26"</option>
+        <option value="622">700 C (28-622)</option>
+        <option value="590">26" × 1 3/8" (28-590)</option>
       </select>
       <input id="wheelsize_txt" type="text" />
       <a href="#customWheelsize">custom</a><br>
       <label for="cranksize_slt">Crank Size</label>
       <select id="cranksize_slt">
-        <option>170mm</option>
-        <option>172.5mm</option>
-        <option>175mm</option>
-        <option>177.5mm</option>
-        <option>180mm</option>
-        <option>182.5mm</option>
+        <option value="170">170mm</option>
+        <option value="172.5">172.5mm</option>
+        <option value="175">175mm</option>
+        <option value="177.5">177.5mm</option>
+        <option value="180">180mm</option>
+        <option value="182.5">182.5mm</option>
       </select>
       <input id="cranksize_txt" type="text" />
       <a href="#customCranksize">custom</a>
@@ -117,5 +121,38 @@ input[type=text] {
 </div>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="http://blueimp.github.com/cdn/js/bootstrap.js"></script>
+<script>
+(function(){
+  $(function(){
+    var props = ['Chainring','Sprocket','Wheelsize','Cranksize'],
+        i = 0,
+        l = props.length;
+    for(;i<l;i++){
+      (function(){
+        var name = props[i].toLowerCase();
+        $('a[href=#custom'+props[i]+']').click(function(){
+          $(this).hide();
+          var slt = $('#'+name+'_slt'),
+              txt = $('#'+name+'_txt');
+          slt.hide();
+          txt.val(slt.val());
+          txt.show();
+          selectSpecify();
+        });
+      })();
+    }
+    var builtin = $('#builtin_rad'),
+        specify = $('#specified_rad');
+    function selectBuiltin(){
+        builtin.attr("checked", "checked");
+    }
+    function selectSpecify(){
+        specify.attr("checked", "checked");
+    }
+    $('#builtin_slt').click(selectBuiltin).change(selectBuiltin);
+    $('#specify input, #specify select').click(selectSpecify).change(selectSpecify);
+  });
+})()
+</script>
 </body>
 </html>
