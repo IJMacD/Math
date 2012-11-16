@@ -5,34 +5,56 @@
 body {
     font-family: sans-serif;
 }
+h3 {
+    margin-bottom: 0
+}
+#builtin {
+    display: inline-block;
+    padding: 10px;
+    vertical-align: top;
+    width: 250px;
+}
+#specify {
+    display: inline-block;
+    padding: 10px;
+    vertical-align: top;
+    width: 350px;
+}
+#specify label {
+    display: inline-block;
+    width: 165px;
+}
 </style>
 </head>
 <body>
 <h1>Gain Ratios</h1>
-<canvas width="1000" height="500"></canvas>
+<canvas width="1000" height="350"></canvas>
 <h2>Bikes:</h2>
 <ul id="bike_lst"></ul>
 <h3>Add Bike:</h3>
-<label for="builtin_slt">Pick built-in bike:</label>
+<div id="builtin">
+<h4>Pick built-in bike:</h4>
 <select id="builtin_slt">
 <option>B'twin Triban 3</option>
 <option>Carrera Tdf</option>
 <option>I1</option>
 <option>I2</option>
 </select>
-<p>Or specify bike:</p>
+</div>
+<div id="specify">
+<h4>Or specify bike:</h4>
 <label for="chainring_txt">Chainrings</label>
-<input id="chainring_txt" />
+<input id="chainring_txt" /><br>
 <label for="cassette_slt">Cassette/Freewheel</label>
 <select id="cassette_slt">
 <option>26,23,21,19,17,15,13,12</option>
-</select>
-<label for="wheelsize_slt">
+</select><br>
+<label for="wheelsize_slt">Wheel Size</label>
 <select id="wheelsize_slt">
 <option value="622">700C</option>
 <option value="557">26"</option>
-</select>
-<label for="cranksize_slt">
+</select><br>
+<label for="cranksize_slt">Crank Size</label>
 <select id="cranksize_slt">
 <option>170mm</option>
 <option>172.5mm</option>
@@ -41,4 +63,7 @@ body {
 <option>180mm</option>
 <option>182.5mm</option>
 </select>
+</div>
 <button id="addbike_btn">Add Bike</button>
+</body>
+</html>
