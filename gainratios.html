@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>Bike Gain Ratios</title>
+<style>
+body {
+    font-family: sans-serif;
+}
+</style>
+</head>
+<body>
+<h1>Gain Ratios</h1>
+<canvas width="1000" height="500"></canvas>
+<h2>Bikes:</h2>
+<ul id="bike_lst"></ul>
+<h3>Add Bike:</h3>
+<label for="builtin_slt">Pick built-in bike:</label>
+<select id="builtin_slt">
+<option>B'twin Triban 3</option>
+<option>Carrera Tdf</option>
+<option>I1</option>
+<option>I2</option>
+</select>
+<p>Or specify bike:</p>
+<label for="chainring_txt">Chainrings</label>
+<input id="chainring_txt" />
+<label for="cassette_slt">Cassette/Freewheel</label>
+<select id="cassette_slt">
+<option>26,23,21,19,17,15,13,12</option>
+</select>
+<label for="wheelsize_slt">
+<select id="wheelsize_slt">
+<option value="622">700C</option>
+<option value="557">26"</option>
+</select>
+<label for="cranksize_slt">
+<select id="cranksize_slt">
+<option>170mm</option>
+<option>172.5mm</option>
+<option>175mm</option>
+<option>177.5mm</option>
+<option>180mm</option>
+<option>182.5mm</option>
+</select>
+<button id="addbike_btn">Add Bike</button>
