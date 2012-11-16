@@ -1,28 +1,45 @@
 <html>
 <head>
 <title>Bike Gain Ratios</title>
+<link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap.min.css">
 <style>
 body {
-    font-family: sans-serif;
+  font-family: sans-serif;
 }
 h3 {
-    margin-bottom: 0
+  margin-bottom: 0
+}
+input[type=text] {
+  height: 30px;
+}
+#addbike_modal a {
+  font-size: .8em;
+}
+#addbike_modal input[type=text] {
+  display: none;
+}
+#addbike_modal #name_txt {
+  display: inline;
 }
 #builtin {
-    display: inline-block;
-    padding: 10px;
-    vertical-align: top;
-    width: 250px;
+  display: inline-block;
+  padding: 10px;
+  vertical-align: top;
+  width: 250px;
+}
+#builtin input[type=radio],
+#specify input[type=radio] {
+  vertical-align: baseline;
+}
+#builtin label,
+#specify label {
+  display: inline-block;
+  width: 215px;
 }
 #specify {
-    display: inline-block;
-    padding: 10px;
-    vertical-align: top;
-    width: 350px;
-}
-#specify label {
-    display: inline-block;
-    width: 165px;
+  display: inline-block;
+  padding: 10px;
+  vertical-align: top;
 }
 </style>
 </head>
@@ -31,39 +48,74 @@ h3 {
 <canvas width="1000" height="350"></canvas>
 <h2>Bikes:</h2>
 <ul id="bike_lst"></ul>
-<h3>Add Bike:</h3>
-<div id="builtin">
-<h4>Pick built-in bike:</h4>
-<select id="builtin_slt">
-<option>B'twin Triban 3</option>
-<option>Carrera Tdf</option>
-<option>I1</option>
-<option>I2</option>
-</select>
+<a href="#addbike_modal" role="button" class="btn" data-toggle="modal">Add Bike</a>
+
+<div id="addbike_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addbike_modal_lbl" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="addbike_modal_lbl">Choose Bike Options</h3>
+  </div>
+  <div class="modal-body">
+    <div id="builtin">
+      <input type="radio" name="specified" id="builtin_rad" checked />
+      <label for="builtin_rad">
+        <h4>Pick built-in bike:</h4>
+      </label>
+      <select id="builtin_slt">
+        <option>B'twin Triban 3</option>
+        <option>Carrera Tdf</option>
+        <option>I1</option>
+        <option>I2</option>
+      </select>
+    </div>
+    <div id="specify">
+      <input type="radio" name="specified" id="specified_rad" />
+      <label for="specified_rad">
+        <h4>Or specify bike:</h4>
+      </label><br>
+      <label for="name_txt">Name</label>
+      <input type="text" id="name_txt" required /><br>
+      <label for="chainring_slt">Chainrings</label>
+      <select id="chainring_slt">
+        <option>52 42</option>
+        <option>52 39</option>
+        <option>50 39 30</option>
+        <option selected>50 34</option>
+      </select>
+      <input id="chainring_txt" type="text"/>
+      <a href="#customChainring">custom</a><br>
+      <label for="sprocket_slt">Sprockets</label>
+      <select id="sprocket_slt">
+        <option selected>26 23 21 19 17 15 13 12</option>
+      </select>
+      <input id="sprocket_txt" type="text" />
+      <a href="#customSprocket">custom</a><br>
+      <label for="wheelsize_slt">Wheel Size</label>
+      <select id="wheelsize_slt">
+        <option value="622">700C</option>
+        <option value="557">26"</option>
+      </select>
+      <input id="wheelsize_txt" type="text" />
+      <a href="#customWheelsize">custom</a><br>
+      <label for="cranksize_slt">Crank Size</label>
+      <select id="cranksize_slt">
+        <option>170mm</option>
+        <option>172.5mm</option>
+        <option>175mm</option>
+        <option>177.5mm</option>
+        <option>180mm</option>
+        <option>182.5mm</option>
+      </select>
+      <input id="cranksize_txt" type="text" />
+      <a href="#customCranksize">custom</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary">Add Bike</button>
+  </div>
 </div>
-<div id="specify">
-<h4>Or specify bike:</h4>
-<label for="chainring_txt">Chainrings</label>
-<input id="chainring_txt" /><br>
-<label for="cassette_slt">Cassette/Freewheel</label>
-<select id="cassette_slt">
-<option>26,23,21,19,17,15,13,12</option>
-</select><br>
-<label for="wheelsize_slt">Wheel Size</label>
-<select id="wheelsize_slt">
-<option value="622">700C</option>
-<option value="557">26"</option>
-</select><br>
-<label for="cranksize_slt">Crank Size</label>
-<select id="cranksize_slt">
-<option>170mm</option>
-<option>172.5mm</option>
-<option>175mm</option>
-<option>177.5mm</option>
-<option>180mm</option>
-<option>182.5mm</option>
-</select>
-</div>
-<button id="addbike_btn">Add Bike</button>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="http://blueimp.github.com/cdn/js/bootstrap.js"></script>
 </body>
 </html>
