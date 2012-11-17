@@ -78,15 +78,15 @@ h3 {
       </label><br>
       <label for="name_txt">Name</label>
       <input type="text" id="name_txt" required /><br>
-      <label for="chainring_lst">Chainrings</label>
-      <select id="chainring_lst">
+      <label for="chainset_lst">Chainset</label>
+      <select id="chainset_lst">
         <option selected>50 34</option>
         <option>50 39 30</option>
         <option>52 39</option>
         <option>52 42</option>
       </select>
-      <input id="chainring_txt" type="text"/>
-      <a href="#customChainring">custom</a><br>
+      <input id="chainset_txt" type="text"/>
+      <a href="#customChainset">custom</a><br>
       <label for="sprocket_lst">Sprockets</label>
       <select id="sprocket_lst">
         <option>11 13 15 17 19 21 23 25</option>
@@ -99,7 +99,7 @@ h3 {
         <option value="690">27" × 1 3/8" (690 mm)</option>
         <option value="686">27" × 1 1/4" (686 mm)</option>
         <option value="684">27" × 1 1/8" (684 mm)</option>
-        <option value="680">26" × 1" (680 mm)</option>
+        <option value="680">27" × 1" (680 mm)</option>
         <option value="740">700 × 56 (740 mm)</option>
         <option value="730">700 × 50 (730 mm)</option>
         <option value="708">700 × 44 (708 mm)</option>
@@ -139,7 +139,7 @@ h3 {
 <script>
 (function(){
   $(function(){
-    var props = ['Chainring','Sprocket','Wheelsize','Cranksize'],
+    var props = ['Chainset','Sprocket','Wheelsize','Cranksize'],
         builtin_bikes = {
         // 'bikeid': [ [chainset], [sprockets], wheelradius, cranklength, name, (primary colour), (secondary colour) ]
           //'test': [ [53], [19], 340, 170, "Test" ],
@@ -179,8 +179,10 @@ h3 {
     }
     function selectBuiltin(){
       builtin_rad.attr("checked", "checked");
+      specify_rad.removeAttr("checked");
     }
     function selectSpecify(){
+      builtin_rad.removeAttr("checked");
       specify_rad.attr("checked", "checked");
     }
     function drawGainRatios(){
@@ -269,13 +271,40 @@ h3 {
     $('#specify input, #specify select').click(selectSpecify).change(selectSpecify);
     $('#addbike_btn').click(function(){
       $('#addbike_modal').modal('hide');
-      if(builtin_rad.val()){
+      if(builtin_rad[0].checked){
         bikes.push(builtin_bikes[builtin_lst.val()]);
+        drawGainRatios();
+      }else{
+        var bike = [],
+            chainset = $('#chainset_txt').val(),
+            sprockets = $('#sprocket_txt').val(),
+            wheelsize = $('#wheelsize_txt').val(),
+            cranksize = $('#cranksize_txt').val(),
+            name = $('#name_txt').val();
+        if(!chainset)
+          chainset = $('#chainset_lst').val();
+        if(!sprockets)
+          sprockets = $('#sprocket_lst').val();
+        if(!wheelsize)
+          wheelsize = $('#wheelsize_lst').val();
+        if(!cranksize)
+          cranksize = $('#cranksize_lst').val();
+        if(!name)
+          name = "bike"+(Math.random()*10000).toFixed();
+        chainset = chainset.split(" ");
+        sprockets = sprockets.split(" ");
+        wheelsize = wheelsize / 2;
+        bike.push(chainset);
+        bike.push(sprockets);
+        bike.push(wheelsize);
+        bike.push(cranksize);
+        bike.push(name);
+        bikes.push(bike)
         drawGainRatios();
       }
     });
   });
-})()
+})();
 </script>
 </body>
 </html>
