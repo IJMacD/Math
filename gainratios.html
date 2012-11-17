@@ -5,12 +5,6 @@
 <title>Bike Gain Ratios</title>
 <link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap.min.css">
 <style>
-body {
-  font-family: sans-serif;
-}
-canvas {
-  width: 100%;
-}
 h3 {
   margin-bottom: 0
 }
@@ -48,9 +42,7 @@ h3 {
 <body>
 <div class="container">
   <h1>Gain Ratios</h1>
-  <canvas width="800" height="400"></canvas>
-  <h2>Bikes:</h2>
-  <ul id="bike_lst"></ul>
+  <canvas width="800" height="0"></canvas><br>
   <a href="#addbike_modal" role="button" class="btn" data-toggle="modal">Add Bike</a>
 </div>
 
@@ -124,16 +116,15 @@ h3 {
         // 'bikeid': [ [chainset], [sprockets], wheelradius, cranklength, name, (primary colour), (secondary colour) ]
           //'test': [ [53], [19], 340, 170, "Test" ],
           'tdf': [ [52,39], [12,13,15,17,19,21,23,26], 336, 170, "Carrera Tdf", "rgb(255,255,0)", "rgb(0,0,0)" ],
-          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)" ],
-          'I1': [ [38], [16], 311, 170, "I1" ],
-          'I2': [ [52,42,], [12,13,15,17,19,21,23,26], 336, 170, "I2" ]
+          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(192,0,0)" ],
+          'I1': [ [38], [16], 311, 170, "I1", "rgb(192,192,255)" ],
+          'I2': [ [52,42,], [12,13,15,17,19,21,23,26], 336, 170, "I2", "rgb(255,255,0)", "rgb(0,0,0)" ]
         },
         i = 0,
         l = props.length,
         builtin_rad = $('#builtin_rad'),
         specify_rad = $('#specified_rad'),
         builtin_lst = $('#builtin_lst'),
-        bike_lst = $('#bike_lst'),
         bikes = [],
         canvas = $('canvas')[0],
         ctx = canvas.getContext('2d');
@@ -161,15 +152,6 @@ h3 {
     function selectSpecify(){
       specify_rad.attr("checked", "checked");
     }
-    function drawBikesList(){
-      var i = 0,
-          l = bikes.length,
-          ratios;
-      bike_lst.empty();
-      for(;i<l;i++){
-        $('<li>').text(bikes[i][4]).appendTo(bike_lst);
-      }
-    }
     function drawGainRatios(){
       var i,
           l = bikes.length,
@@ -178,7 +160,9 @@ h3 {
           m,
           max = 0,
           xscale,
-          last_line;
+          last_line,
+          y;
+      canvas.height = l * 50 + 50;
       for(i=0;i<l;i++){
         ratios = calculateGainRatios(bikes[i]);
         m = ratios.length;
@@ -193,16 +177,24 @@ h3 {
         ctx.lineTo(i*xscale, canvas.height);
         ctx.stroke();
       }
+      ctx.font = "16px sans-serif";
       for(i=0;i<l;i++){
         ratios = calculateGainRatios(bikes[i]);
         m = ratios.length;
+        y = 50 + i*50;
+        ctx.strokeStyle = "rgb(255,255,255)";
+        ctx.fillStyle = "rgb(0,0,0)";
+        ctx.lineWidth = 4;
+        ctx.strokeText(bikes[i][4], 30, y);
+        ctx.fillText(bikes[i][4], 30, y);
         if(bikes[i][5])
-        ctx.fillStyle = bikes[i][5];
+          ctx.fillStyle = bikes[i][5];
         for(j=0;j<m;j++){
           ctx.beginPath();
-          ctx.arc(ratios[j]*xscale, 50 + i*50, 4, 0, Math.PI * 2, true);
+          ctx.arc(ratios[j]*xscale, y, 5, 0, Math.PI * 2, true);
           ctx.fill();
           if(bikes[i][6]){
+            ctx.lineWidth = 2;
             ctx.strokeStyle = bikes[i][6];
             ctx.stroke();
           }
@@ -235,7 +227,6 @@ h3 {
       $('#addbike_modal').modal('hide');
       if(builtin_rad.val()){
         bikes.push(builtin_bikes[builtin_lst.val()]);
-        drawBikesList();
         drawGainRatios();
       }
     });
