@@ -80,6 +80,7 @@ h3 {
       <input type="text" id="name_txt" required /><br>
       <label for="chainset_lst">Chainset</label>
       <select id="chainset_lst">
+        <option>48 38 28</option>
         <option selected>50 34</option>
         <option>50 39 30</option>
         <option>52 39</option>
@@ -91,6 +92,7 @@ h3 {
       <select id="sprocket_lst">
         <option>11 13 15 17 19 21 23 25</option>
         <option>12 13 15 17 19 21 23 26</option>
+        <option>13 15 17 19 22 25 28</option>
       </select>
       <input id="sprocket_txt" type="text" />
       <a href="#customSprocket">custom</a><br>
@@ -144,7 +146,7 @@ h3 {
         // 'bikeid': [ [chainset], [sprockets], wheelradius, cranklength, name, (primary colour), (secondary colour) ]
           //'test': [ [53], [19], 340, 170, "Test" ],
           'tdf': [ [52,39], [12,13,15,17,19,21,23,26], 336, 170, "Carrera Tdf", "rgb(255,255,0)", "rgb(0,0,0)" ],
-          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(128,0,0)" ],
+          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(96,0,0)" ],
           'I1': [ [38], [16], 311, 170, "I1", "rgb(192,192,255)", "rgb(192,192,192)" ],
           'I2': [ [52,42], [12,13,15,17,19,21,23,26], 336, 170, "I2", "rgb(255,255,0)", "rgb(0,0,0)" ],
           'supersix': [ [53,39], [11,12,13,14,15,16,17,19,21,23,25], 336, 170, "Cannondale Supersix Evo", "rgb(128,128,128)", "rgb(0,0,0)" ],
@@ -161,11 +163,11 @@ h3 {
         ctx = canvas.getContext('2d');
     for(;i<l;i++){
       (function(){
-        var name = props[i].toLowerCase();
+        var name = props[i].toLowerCase(),
+            lst = $('#'+name+'_lst'),
+            txt = $('#'+name+'_txt');
         $('a[href=#custom'+props[i]+']').click(function(){
           $(this).hide();
-          var lst = $('#'+name+'_lst'),
-              txt = $('#'+name+'_txt');
           lst.hide();
           txt.val(lst.val());
           txt.show();
@@ -209,11 +211,15 @@ h3 {
       xscale = (canvas.width - 20) / max;
       last_line = Math.floor(max);
       ctx.strokeStyle = "rgb(192,192,192)";
+      ctx.fillStyle = "rgb(192,192,192)";
+      ctx.font = "12px sans-serif";
       for(i=1;i<=last_line;i++){
         ctx.beginPath();
         ctx.moveTo(i*xscale, 0);
         ctx.lineTo(i*xscale, canvas.height);
         ctx.stroke();
+        ctx.fillText(i,i*xscale,12);
+        ctx.fillText(i,i*xscale,canvas.height);
       }
       ctx.font = "16px sans-serif";
       for(i=0;i<l;i++){
@@ -231,7 +237,7 @@ h3 {
           n = ratios[j].length;
           for(k=0;k<n;k++){
             x = ratios[j][k]*xscale;
-            y = 50 + i*50 + j*10;
+            y = 50 + i*50 + (m-j-1)*10;
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, Math.PI * 2, true);
             ctx.fill();
