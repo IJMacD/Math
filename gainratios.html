@@ -80,34 +80,50 @@ h3 {
       <input type="text" id="name_txt" required /><br>
       <label for="chainring_lst">Chainrings</label>
       <select id="chainring_lst">
-        <option>52 42</option>
-        <option>52 39</option>
-        <option>50 39 30</option>
         <option selected>50 34</option>
+        <option>50 39 30</option>
+        <option>52 39</option>
+        <option>52 42</option>
       </select>
       <input id="chainring_txt" type="text"/>
       <a href="#customChainring">custom</a><br>
       <label for="sprocket_lst">Sprockets</label>
       <select id="sprocket_lst">
-        <option selected>26 23 21 19 17 15 13 12</option>
+        <option>11 13 15 17 19 21 23 25</option>
+        <option>12 13 15 17 19 21 23 26</option>
       </select>
       <input id="sprocket_txt" type="text" />
       <a href="#customSprocket">custom</a><br>
       <label for="wheelsize_lst">Wheel Size</label>
       <select id="wheelsize_lst">
-        <option value="622">700 C (28-622)</option>
-        <option value="590">26" × 1 3/8" (28-590)</option>
+        <option value="690">27" × 1 3/8" (690 mm)</option>
+        <option value="686">27" × 1 1/4" (686 mm)</option>
+        <option value="684">27" × 1 1/8" (684 mm)</option>
+        <option value="680">26" × 1" (680 mm)</option>
+        <option value="740">700 × 56 (740 mm)</option>
+        <option value="730">700 × 50 (730 mm)</option>
+        <option value="708">700 × 44 (708 mm)</option>
+        <option value="694">700 × 38 (694 mm)</option>
+        <option value="690">700 × 35 (690 mm)</option>
+        <option value="684">700 × 32 (684 mm)</option>
+        <option value="672">700 × 28 (672 mm)</option>
+        <option value="670">700 × 25 (670 mm)</option>
+        <option value="664">700 × 20 (664 mm)</option>
+        <option value="624" selected>26" × 1.50 (624 mm)</option>
+        <option value="622">26" × 1.25 (622 mm)</option>
+        <option value="610">26" × 1.0 (610 mm)</option>
+        <option value="622">26" × 1 (650C) (622 mm)</option>
       </select>
       <input id="wheelsize_txt" type="text" />
       <a href="#customWheelsize">custom</a><br>
       <label for="cranksize_lst">Crank Size</label>
       <select id="cranksize_lst">
-        <option value="170">170mm</option>
-        <option value="172.5">172.5mm</option>
-        <option value="175">175mm</option>
-        <option value="177.5">177.5mm</option>
-        <option value="180">180mm</option>
-        <option value="182.5">182.5mm</option>
+        <option value="170">170 mm</option>
+        <option value="172.5">172.5 mm</option>
+        <option value="175">175 mm</option>
+        <option value="177.5">177.5 mm</option>
+        <option value="180">180 mm</option>
+        <option value="182.5">182.5 mm</option>
       </select>
       <input id="cranksize_txt" type="text" />
       <a href="#customCranksize">custom</a>
@@ -129,8 +145,10 @@ h3 {
           //'test': [ [53], [19], 340, 170, "Test" ],
           'tdf': [ [52,39], [12,13,15,17,19,21,23,26], 336, 170, "Carrera Tdf", "rgb(255,255,0)", "rgb(0,0,0)" ],
           'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(128,0,0)" ],
-          'I1': [ [38], [16], 311, 170, "I1", "rgb(192,192,255)" ],
-          'I2': [ [52,42], [12,13,15,17,19,21,23,26], 336, 170, "I2", "rgb(255,255,0)", "rgb(0,0,0)" ]
+          'I1': [ [38], [16], 311, 170, "I1", "rgb(192,192,255)", "rgb(192,192,192)" ],
+          'I2': [ [52,42], [12,13,15,17,19,21,23,26], 336, 170, "I2", "rgb(255,255,0)", "rgb(0,0,0)" ],
+          'supersix': [ [53,39], [11,12,13,14,15,16,17,19,21,23,25], 336, 170, "Cannondale Supersix Evo", "rgb(128,128,128)", "rgb(0,0,0)" ],
+          'nukeproof': [ [36], [11,12,13,14,15,17,19,21,23,26], 330, 170, "Nukeproof Snap Comp", "rgb(202,202,202)", "rgb(40,40,40)" ]
         },
         i = 0,
         l = props.length,
