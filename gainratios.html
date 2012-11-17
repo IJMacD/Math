@@ -37,6 +37,17 @@ h3 {
   padding: 10px;
   vertical-align: top;
 }
+#tooltips {
+  left: 42px;
+  position: absolute;
+  top: 60px;
+}
+#tooltips p {
+  cursor: pointer;
+  height: 10px;
+  position: absolute;
+  width: 10px;
+}
 </style>
 </head>
 <body>
@@ -44,6 +55,7 @@ h3 {
   <h1>Gain Ratios</h1>
   <canvas width="800" height="0"></canvas><br>
   <a href="#addbike_modal" role="button" class="btn" data-toggle="modal">Add Bike</a>
+  <div id="tooltips"></div>
 </div>
 
 <div id="addbike_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addbike_modal_lbl" aria-hidden="true">
@@ -116,7 +128,7 @@ h3 {
         // 'bikeid': [ [chainset], [sprockets], wheelradius, cranklength, name, (primary colour), (secondary colour) ]
           //'test': [ [53], [19], 340, 170, "Test" ],
           'tdf': [ [52,39], [12,13,15,17,19,21,23,26], 336, 170, "Carrera Tdf", "rgb(255,255,0)", "rgb(0,0,0)" ],
-          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(192,0,0)" ],
+          'triban3': [ [50,39,30], [12,13,15,17,19,21,23,25], 336, 170, "B'twin Triban 3", "rgb(255,0,0)", "rgb(128,0,0)" ],
           'I1': [ [38], [16], 311, 170, "I1", "rgb(192,192,255)" ],
           'I2': [ [52,42,], [12,13,15,17,19,21,23,26], 336, 170, "I2", "rgb(255,255,0)", "rgb(0,0,0)" ]
         },
@@ -125,6 +137,7 @@ h3 {
         builtin_rad = $('#builtin_rad'),
         specify_rad = $('#specified_rad'),
         builtin_lst = $('#builtin_lst'),
+        tooltips = $('#tooltips'),
         bikes = [],
         canvas = $('canvas')[0],
         ctx = canvas.getContext('2d');
@@ -161,8 +174,9 @@ h3 {
           max = 0,
           xscale,
           last_line,
-          y;
+          x, y;
       canvas.height = l * 50 + 50;
+      tooltips.empty();
       for(i=0;i<l;i++){
         ratios = calculateGainRatios(bikes[i]);
         m = ratios.length;
@@ -190,14 +204,16 @@ h3 {
         if(bikes[i][5])
           ctx.fillStyle = bikes[i][5];
         for(j=0;j<m;j++){
+          x = ratios[j]*xscale;
           ctx.beginPath();
-          ctx.arc(ratios[j]*xscale, y, 5, 0, Math.PI * 2, true);
+          ctx.arc(x, y, 5, 0, Math.PI * 2, true);
           ctx.fill();
           if(bikes[i][6]){
             ctx.lineWidth = 2;
             ctx.strokeStyle = bikes[i][6];
             ctx.stroke();
           }
+          $('<p>').attr("title", ratios[j].toFixed(2)).css({left:(x-5)+"px",top:(y-5)+"px"}).tooltip().appendTo(tooltips);
         }
       }
     }
