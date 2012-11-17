@@ -60,6 +60,8 @@
           x, y;
       canvas.height = l * 50 + 50;
       tooltips.empty();
+      tooltips[0].style.top = canvas.offsetTop+"px";
+      tooltips[0].style.left = canvas.offsetLeft+"px";
       for(i=0;i<l;i++){
         ratios = calculateGainRatios(bikes[i]);
         m = ratios.length;
@@ -140,11 +142,16 @@
         bikes.push(builtin_bikes[builtin_lst.val()]);
         drawGainRatios();
       }else{
-        var chainset = $('#chainset_txt').val(),
+        var rand = function(){
+              return (Math.random()*256).toFixed();
+            },
+            chainset = $('#chainset_txt').val(),
             sprockets = $('#sprocket_txt').val(),
             wheelsize = $('#wheelsize_txt').val(),
             cranksize = $('#cranksize_txt').val(),
-            name = $('#name_txt').val();
+            name = $('#name_txt').val(),
+            fore = "rgb("+rand()+","+rand()+","+rand()+")";
+            back = "rgb("+rand()+","+rand()+","+rand()+")";
         if(!chainset)
           chainset = $('#chainset_lst').val();
         if(!sprockets)
@@ -158,9 +165,10 @@
         chainset = chainset.split(" ");
         sprockets = sprockets.split(" ");
         wheelsize = wheelsize / 2;
-        bikes.push([chainset, sprockets, wheelsize, cranksize, name])
+        bikes.push([chainset, sprockets, wheelsize, cranksize, name, back, fore])
         drawGainRatios();
       }
     });
+    $(window).resize(drawGainRatios);
   });
 })();
