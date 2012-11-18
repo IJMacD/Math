@@ -35,9 +35,23 @@ h3 {
   position: absolute;
   top: 60px;
 }
-#tooltips p {
+#tooltips a {
   cursor: pointer;
   height: 10px;
   position: absolute;
   width: 10px;
+}
+#tooltips .removeBike {
+  color: white;
+  font-size: 16px;
+  height: 40px;
+  margin: 0;
+  position: absolute;
+  width: 800px;
+}
+#tooltips .removeBike a,
+#tooltips .removeBike a:hover {
+  color: red;
+  display: none;
+  text-decoration: none;
 }

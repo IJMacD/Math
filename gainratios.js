@@ -1,3 +1,8 @@
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
 (function(){
   $(function(){
     var props = ['Chainset','Sprocket','Wheelsize','Cranksize'],
@@ -92,6 +97,19 @@
         ctx.lineWidth = 4;
         ctx.strokeText(bikes[i][4], 30, y);
         ctx.fillText(bikes[i][4], 30, y);
+        (function(){
+          var bike = i,
+              p = $('<p>').addClass("removeBike").css({left:"10px",top:(y-16)+"px"}).appendTo(tooltips),
+              a = $('<a>').text("×").click(function(){
+                bikes.remove(bike);
+                drawGainRatios();
+              }).appendTo(p);
+          p.hover(function(){
+            a.show();
+          }, function(){
+            a.hide();
+          });
+        })();
         if(bikes[i][5])
           ctx.fillStyle = bikes[i][5];
         for(j=0;j<m;j++){
@@ -107,7 +125,7 @@
               ctx.strokeStyle = bikes[i][6];
               ctx.stroke();
             }
-            $('<p>').attr("title", bikes[i][0][j]+"x"+bikes[i][1][k]).css({left:(x-5)+"px",top:(y-5)+"px"}).tooltip().appendTo(tooltips);
+            $('<a>').attr("title", bikes[i][0][j]+"x"+bikes[i][1][k]).css({left:(x-5)+"px",top:(y-5)+"px"}).tooltip().appendTo(tooltips);
           }
         }
       }
@@ -150,7 +168,7 @@
             wheelsize = $('#wheelsize_txt').val(),
             cranksize = $('#cranksize_txt').val(),
             name = $('#name_txt').val(),
-            fore = "rgb("+rand()+","+rand()+","+rand()+")";
+            fore = "rgb("+rand()+","+rand()+","+rand()+")",
             back = "rgb("+rand()+","+rand()+","+rand()+")";
         if(!chainset)
           chainset = $('#chainset_lst').val();
