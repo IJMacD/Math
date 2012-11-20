@@ -83,14 +83,16 @@ Array.prototype.remove = function(from, to) {
           xscale,
           last_line,
           x, y,
-          title;
+          title,
+          len;
       canvas.height = l * 50 + 50;
       tooltips.empty();
       tooltips[0].style.top = canvas.offsetTop+"px";
       tooltips[0].style.left = canvas.offsetLeft+"px";
       for(i=0;i<l;i++){
         ratios = calculateGainRatios(bikes[i]);
-        max = Math.max(max, ratios[0][0]);
+        len = ratios.length;
+        max = Math.max(max, ratios[len-1][ratios[len-1].length-1]);
       }
       xscale = (canvas.width - 20) / max;
       last_line = Math.floor(max);
@@ -144,10 +146,22 @@ Array.prototype.remove = function(from, to) {
               ctx.stroke();
             }
             if(typeof bikes[i].gearhub == "undefined")
-              title = bikes[i][0][j]+"×"+bikes[i][1][k];
+              title = bikes[i][0][m-j-1]+"×"+bikes[i][1][n-k-1];
             else
-              title = bikes[i][0][j]+"×"+bikes[i][1][0]+"("+(k+1)+")";
-            $('<a>').attr("title", title).css({left:(x-5)+"px",top:(y-5)+"px"}).tooltip().appendTo(tooltips);
+              title = bikes[i][0][m-j-1]+"×"+bikes[i][1][0]+"("+(k+1)+")";
+            $('<a>')
+              .attr("title", title)
+              .css({left:(x-5)+"px",top:(y-5)+"px"})
+              .tooltip()
+              .popover({
+                content: 'Bike: '+bikes[i][4]+
+                  '<br>Gear: '+(bikes[i].gearhub?(k+1):(j+1)+','+(k+1))+
+                  '<br>Wheelsize: '+(bikes[i][2]*2).toFixed()+" mm"+
+                  '<br>Crank Length: '+bikes[i][3].toFixed()+" mm"+
+                  '<br>Ratio: '+ratios[j][k].toFixed(2),
+                html:true
+              })
+              .appendTo(tooltips);
           }
         }
       }
@@ -165,25 +179,23 @@ Array.prototype.remove = function(from, to) {
           sp,
           r = wr / cl,
           f;
-      if(bike.gearhub){
-        for(;i<l;i++){
+      for(i=l-1;i>=0;i--){
+        if(bike.gearhub){
           o = [];
           m = bike.gearhub.length;
           cr = bike[0][i];
           sp = bike[1][0];
-          for(j=m-1;j>=0;j--){
+          for(j=0;j<m;j++){
             f = bike.gearhub[j];
             o.push(r * (cr / sp) * f);
           }
           out.push(o);
         }
-      }
-      else{
-        for(;i<l;i++){
+        else{
           o = [];
           m = bike[1].length;
           cr = bike[0][i];
-          for(j=0;j<m;j++){
+          for(j=m-1;j>=0;j--){
             sp = bike[1][j];
             o.push(r * (cr / sp));
           }
@@ -225,8 +237,9 @@ Array.prototype.remove = function(from, to) {
         chainset = chainset.split(" ");
         sprockets = sprockets.split(" ");
         wheelsize = wheelsize / 2;
+        cranksize = cranksize * 1;
         bike = [chainset, sprockets, wheelsize, cranksize, name, back, fore];
-        if(gearhub[0].style.display != "none")
+        if(gearhub[0].style.display != "" && gearhub[0].style.display != "none")
           bike.gearhub = builtin_hubs[gearhub.val()];
         bikes.push(bike);
         drawGainRatios();
