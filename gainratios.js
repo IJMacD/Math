@@ -27,8 +27,11 @@ $(function(){
       builtin_lst = $('#builtin_lst'),
       tooltips = $('#tooltips'),
       bikes = [],
+      ratios = [],
+      max_ratio = 0,
       canvas = $('canvas')[0],
-      ctx = canvas.getContext('2d');
+      ctx = canvas.getContext('2d'),
+      isAnimating = false;
   builtin_bikes['I1'].gearhub = [0.632,0.741,0.843,0.989,1.145,1.335,1.545];
   for(;i<l;i++){
     (function(){
@@ -73,28 +76,22 @@ $(function(){
   function drawGainRatios(){
     var i,
         l = bikes.length,
-        ratios,
         j,
         k,
         m,
         n,
-        max = 0,
         xscale,
         last_line,
         x, y,
         title,
         len;
-    canvas.height = l * 50 + 50;
+    if(!isAnimating)
+      canvas.height = l * 50 + 50;
     tooltips.empty();
     tooltips[0].style.top = canvas.offsetTop+"px";
     tooltips[0].style.left = canvas.offsetLeft+"px";
-    for(i=0;i<l;i++){
-      ratios = calculateGainRatios(bikes[i]);
-      len = ratios.length;
-      max = Math.max(max, ratios[len-1][ratios[len-1].length-1]);
-    }
-    xscale = (canvas.width - 20) / max;
-    last_line = Math.floor(max);
+    xscale = (canvas.width - 20) / max_ratio;
+    last_line = Math.floor(max_ratio);
     ctx.strokeStyle = "rgb(192,192,192)";
     ctx.fillStyle = "rgb(192,192,192)";
     ctx.font = "12px sans-serif";
@@ -108,8 +105,7 @@ $(function(){
     }
     ctx.font = "16px sans-serif";
     for(i=0;i<l;i++){
-      ratios = calculateGainRatios(bikes[i]);
-      m = ratios.length;
+      m = ratios[i].length;
       y = 50 + i*50;
       ctx.strokeStyle = "rgb(255,255,255)";
       ctx.fillStyle = "rgb(0,0,0)";
@@ -121,6 +117,7 @@ $(function(){
             p = $('<p>').addClass("removeBike").css({left:"10px",top:(y-16)+"px"}).appendTo(tooltips),
             a = $('<a>').text("×").click(function(){
               bikes.remove(bike);
+              calculateRatios();
               drawGainRatios();
             }).appendTo(p);
         p.hover(function(){
@@ -132,9 +129,9 @@ $(function(){
       if(bikes[i][5])
         ctx.fillStyle = bikes[i][5];
       for(j=0;j<m;j++){
-        n = ratios[j].length;
+        n = ratios[i][j].length;
         for(k=0;k<n;k++){
-          x = ratios[j][k]*xscale;
+          x = ratios[i][j][k]*xscale;
           y = 50 + i*50 + (m-j-1)*10;
           ctx.beginPath();
           ctx.arc(x, y, 5, 0, Math.PI * 2, true);
@@ -148,19 +145,21 @@ $(function(){
             title = bikes[i][0][m-j-1]+"×"+bikes[i][1][n-k-1];
           else
             title = bikes[i][0][m-j-1]+"×"+bikes[i][1][0]+"("+(k+1)+")";
-          $('<a>')
-            .attr("title", title)
-            .css({left:(x-5)+"px",top:(y-5)+"px"})
-            .tooltip()
-            .popover({
-              content: 'Bike: '+bikes[i][4]+
-                '<br>Gear: '+(bikes[i].gearhub?(k+1):(j+1)+','+(k+1))+
-                '<br>Wheelsize: '+(bikes[i][2]*2).toFixed()+" mm"+
-                '<br>Crank Length: '+bikes[i][3].toFixed()+" mm"+
-                '<br>Ratio: '+ratios[j][k].toFixed(2),
-              html:true
-            })
-            .appendTo(tooltips);
+          if(!isAnimating){
+            $('<a>')
+              .attr("title", title)
+              .css({left:(x-5)+"px",top:(y-5)+"px"})
+              .tooltip()
+              .popover({
+                content: 'Bike: '+bikes[i][4]+
+                  '<br>Gear: '+(bikes[i].gearhub?(k+1):(j+1)+','+(k+1))+
+                  '<br>Wheelsize: '+(bikes[i][2]*2).toFixed()+" mm"+
+                  '<br>Crank Length: '+bikes[i][3].toFixed()+" mm"+
+                  '<br>Ratio: '+ratios[i][j][k].toFixed(2),
+                html:true
+              })
+              .appendTo(tooltips);
+          }
         }
       }
     }
@@ -207,9 +206,10 @@ $(function(){
   $('#specify input, #specify select').click(selectSpecify).change(selectSpecify);
   $('#addbike_btn').click(function(){
     $('#addbike_modal').modal('hide');
+    var bike,
+        num_bikes = bikes.length + 1;
     if(builtin_rad[0].checked){
-      bikes.push(builtin_bikes[builtin_lst.val()]);
-      drawGainRatios();
+      bike = builtin_bikes[builtin_lst.val()];
     }else{
       var rand = function(){
             return (Math.random()*256).toFixed();
@@ -240,9 +240,46 @@ $(function(){
       bike = [chainset, sprockets, wheelsize, cranksize, name, back, fore];
       if(gearhub[0].style.display != "" && gearhub[0].style.display != "none")
         bike.gearhub = builtin_hubs[gearhub.val()];
-      bikes.push(bike);
-      drawGainRatios();
     }
+
+    animate(canvas, "height", num_bikes * 50 + 50, 30, drawGainRatios, function(){
+      bikes.push(bike);
+      calculateRatios();
+      drawGainRatios();
+    });
   });
+  function calculateRatios(){
+    ratios = [];
+    var curr_ratio,
+        i = 0,
+        l = bikes.length,
+        len;
+    for(;i<l;i++){
+      ratios[i] = curr_ratio = calculateGainRatios(bikes[i]);
+      len = curr_ratio.length;
+      max_ratio = Math.max(max_ratio, curr_ratio[len-1][curr_ratio[len-1].length-1]);
+    }
+  }
+  function animate(obj, prop, to_val, steps, on_step, on_complete){
+    if (typeof obj[prop] != "number")
+      return false;
+    isAnimating = true;
+    var curr_val = obj[prop],
+        increment = (to_val - curr_val) / steps,
+        func = (function(){
+            curr_val += increment;
+            obj[prop] = curr_val;
+            if (typeof on_step == "function")
+              on_step();
+            if(curr_val < to_val)
+              requestAnimationFrame(func);
+            else {
+              isAnimating = false;
+              if (typeof on_complete == "function")
+                on_complete();
+            }
+          });
+    requestAnimationFrame(func);
+  }
   $(window).resize(drawGainRatios);
 });
