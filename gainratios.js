@@ -242,11 +242,28 @@ $(function(){
         bike.gearhub = builtin_hubs[gearhub.val()];
     }
 
-    animate(canvas, "height", num_bikes * 50 + 50, 30, drawGainRatios, function(){
+    var cache_ratios = ratios,
+        cache_max = max_ratio,
+        new_max,
+        obj = {max: max_ratio},
+        frames = 30;
+    bikes.push(bike);
+    max_ratio = 0;
+    calculateRatios();
+    new_max = max_ratio;
+    bikes.remove(-1);
+    ratios = cache_ratios;
+    max_ratio = cache_max;
+    animate(canvas, "height", num_bikes * 50 + 50, frames, drawGainRatios, function(){
       bikes.push(bike);
       calculateRatios();
       drawGainRatios();
     });
+    if(max_ratio != new_max){
+      animate(obj, "max", new_max, frames, function(){
+        max_ratio = obj.max;
+      });
+    }
   });
   function calculateRatios(){
     ratios = [];
@@ -274,6 +291,9 @@ $(function(){
             if(curr_val < to_val)
               requestAnimationFrame(func);
             else {
+              obj[prop] = to_val;
+              if (typeof on_step == "function")
+                on_step();
               isAnimating = false;
               if (typeof on_complete == "function")
                 on_complete();
