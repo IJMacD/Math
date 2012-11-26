@@ -31,7 +31,7 @@ $(function(){
       max_ratio = 0,
       canvas = $('canvas')[0],
       ctx = canvas.getContext('2d'),
-      isAnimating = false;
+      numAnimations = 0;
   builtin_bikes['I1'].gearhub = [0.632,0.741,0.843,0.989,1.145,1.335,1.545];
   for(;i<l;i++){
     (function(){
@@ -85,7 +85,7 @@ $(function(){
         x, y,
         title,
         len;
-    if(!isAnimating)
+    if(!numAnimations)
       canvas.height = l * 50 + 50;
     tooltips.empty();
     tooltips[0].style.top = canvas.offsetTop+"px";
@@ -116,9 +116,7 @@ $(function(){
         var bike = i,
             p = $('<p>').addClass("removeBike").css({left:"10px",top:(y-16)+"px"}).appendTo(tooltips),
             a = $('<a>').text("×").click(function(){
-              bikes.remove(bike);
-              calculateRatios();
-              drawGainRatios();
+              removeBike(bike);
             }).appendTo(p);
         p.hover(function(){
           a.show();
@@ -145,7 +143,7 @@ $(function(){
             title = bikes[i][0][m-j-1]+"×"+bikes[i][1][n-k-1];
           else
             title = bikes[i][0][m-j-1]+"×"+bikes[i][1][0]+"("+(k+1)+")";
-          if(!isAnimating){
+          if(!numAnimations){
             $('<a>')
               .attr("title", title)
               .css({left:(x-5)+"px",top:(y-5)+"px"})
@@ -206,8 +204,7 @@ $(function(){
   $('#specify input, #specify select').click(selectSpecify).change(selectSpecify);
   $('#addbike_btn').click(function(){
     $('#addbike_modal').modal('hide');
-    var bike,
-        num_bikes = bikes.length + 1;
+    var bike;
     if(builtin_rad[0].checked){
       bike = builtin_bikes[builtin_lst.val()];
     }else{
@@ -242,13 +239,16 @@ $(function(){
         bike.gearhub = builtin_hubs[gearhub.val()];
     }
 
-    var cache_ratios = ratios,
+    addBike(bike);
+  });
+  function addBike(bike){
+    var num_bikes = bikes.length + 1,
+        cache_ratios = ratios,
         cache_max = max_ratio,
         new_max,
         obj = {max: max_ratio},
         frames = 30;
     bikes.push(bike);
-    max_ratio = 0;
     calculateRatios();
     new_max = max_ratio;
     bikes.remove(-1);
@@ -264,13 +264,30 @@ $(function(){
         max_ratio = obj.max;
       });
     }
-  });
+  }
+  function removeBike(index){
+      var num_bikes = bikes.length - 1,
+          frames = 30,
+          obj = {max: max_ratio},
+          new_ratio;
+      bikes.remove(index);
+      calculateRatios();
+      if(max_ratio != obj.max_ratio){
+        new_ratio = max_ratio;
+        max_ratio = obj.max_ratio;
+        animate(obj, "max", new_ratio, frames, function(){
+          max_ratio = obj.max;
+        });
+      }
+      animate(canvas, "height", num_bikes * 50 + 50, frames, drawGainRatios);
+  }
   function calculateRatios(){
     ratios = [];
     var curr_ratio,
         i = 0,
         l = bikes.length,
         len;
+    max_ratio = 0;
     for(;i<l;i++){
       ratios[i] = curr_ratio = calculateGainRatios(bikes[i]);
       len = curr_ratio.length;
@@ -280,7 +297,7 @@ $(function(){
   function animate(obj, prop, to_val, steps, on_step, on_complete){
     if (typeof obj[prop] != "number")
       return false;
-    isAnimating = true;
+    numAnimations++;
     var curr_val = obj[prop],
         increment = (to_val - curr_val) / steps,
         func = (function(){
@@ -288,13 +305,15 @@ $(function(){
             obj[prop] = curr_val;
             if (typeof on_step == "function")
               on_step();
-            if(curr_val < to_val)
+            if(increment > 0 ?
+                curr_val < to_val :
+                curr_val > to_val)
               requestAnimationFrame(func);
             else {
               obj[prop] = to_val;
               if (typeof on_step == "function")
                 on_step();
-              isAnimating = false;
+              numAnimations--;
               if (typeof on_complete == "function")
                 on_complete();
             }
