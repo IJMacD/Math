@@ -265,6 +265,10 @@ function init(){
     distScaleRange.onclick = function(event){
         DISTANCE_SCALE = Math.pow(10,event.target.value);
     };
+    spdScaleRange = document.getElementById('spd_lin_rng');
+    spdScaleRange.onclick = function(event){
+        SPEED_SCALE = Math.pow(10,event.target.value);
+    };
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
     canvas2 = document.getElementById('canvas2');
@@ -349,9 +353,9 @@ function render(t){
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect (0, 0, width1, height1);
     //sun.draw(ctx, t, o1.x, o1.y);
-    //earth.draw(ctx, t, o1.x, o1.y);
+    earth.draw(ctx, t, o1.x, o1.y);
     //moon.draw(ctx, t, o1.x, o1.y);
-    jupiter.draw(ctx, t, o1.x, o1.y);
+    //jupiter.draw(ctx, t, o1.x, o1.y);
 
     /* ---------------
      * Earth-centric
@@ -504,7 +508,8 @@ Speed:
 <input type="radio" id="spd_log_rad" name="spd_scale" value="log">
 <label for="spd_log_rad">Logaritmic</label>
 <input type="radio" id="spd_lin_rad" name="spd_scale" value="lin" checked>
-<label for="spd_lin_rad">Linear</label><br>
+<label for="spd_lin_rad">Linear</label>
+<input type="range" id="spd_lin_rng" value="3" min="0" max="5" step="0.01" style="width:800px"><br>
 Debug:
 <input type="checkbox" id="debug_chk" name="debug">
 <label for="debug_chk">Debug</label>
