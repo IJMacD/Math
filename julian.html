@@ -1,17 +1,75 @@
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<style>
+#date,
+#test {
+	font-family: sans-serif;
+}
+#date {
+	height: 100%;
+	overflow: hidden;
+	vertical-align: middle;
+}
+#test {
+	display: inline;
+	visibility: hidden;
+	width: auto;
+}
+</style>
+<script src="jquery.min.js"></script>
 <script>
-$(function(){j=new julian('#date');setInterval("j.loop()", 100)});
-function julian(renderElement) 
+$(function(){
+	var j = new Julian('#date p');
+	var testDiv = $('#test'),
+		targetWidth = j.re.width(),
+		fontSizeA = 20,
+		fontSizeB = 30,
+		widthA,
+		widthB;
+	testDiv.text(j.getDate());
+	testDiv.css({fontSize: fontSizeA+"px"});
+	widthA = testDiv.width();
+	testDiv.css({fontSize: fontSizeB+"px"});
+	widthB = testDiv.width();
+
+	if(testDiv.width() > 0)
+	{
+		scale = (fontSizeB - fontSizeA) / (widthB - widthA);
+		fontSize = fontSizeA + (targetWidth - widthA) * scale;
+
+		j.re.css({fontSize: fontSize+"px"});
+
+		testDiv.remove();
+	}
+
+	var f = function(){
+		j.loop();
+		requestAnimationFrame(f);
+	}
+	requestAnimationFrame(f);
+
+});
+function Julian(renderElement) 
 {
 	this.re = $(renderElement);
-	
-	//setInterval("j.loop()", 100);
-	//loop();
-	
+
 	this.loop = function ()
 	{
-		this.computeB();
+		this.computeC();
 		this.render();
+	}
+
+	this.computeC = function (date)
+	{
+		if(!date)
+			date = new Date();
+
+		var a = Math.floor((13 - date.getMonth()) / 12),
+			y = date.getFullYear() + 4800 - a,
+			m = date.getMonth() + 12*a - 2;
+
+		this.jd = date.getDate() + Math.floor((153 * m + 2)/5) + 365 * y
+			+ Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045
+			+ (date.getHours() - 12)/24 + date.getMinutes()/1440
+			+ date.getSeconds()/86400 + date.getMilliseconds()/86400000;
 	}
 
 	this.computeB = function (date)
@@ -50,12 +108,18 @@ function julian(renderElement)
 		
 		this.jd = JD;
 	}
+
+	this.getDate = function (){
+		this.computeC();
+		return this.jd;
+	}
 	
 	this.render = function ()
 	{
 		if(this.re)
-			this.re.text(this.jd)
+			this.re.text(this.jd.toFixed(10));
 	}
 }
 </script>
-<div id="date" style="font-size: 5em"></div>
+<div id="date"><p></p></div>
+<div id="test"></div>
