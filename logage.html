@@ -39,8 +39,8 @@ function loop(){
 	setTimeout("loop()",50);
 }
 function physics(){
-	d = (new Date()).getTime()
-	logage = Math.log((d - birthdate) / (1000 * 60 * 60 * 24 * 365)) * Math.LOG10E
+	d = (new Date()).getTime();
+	logage = Math.log((d - birthdate) / (1000 * 60 * 60 * 24 * 365 * 1.0006643835616438)) * Math.LOG10E
     
     // Now Calculate required time to level up each significant figure
     for(var i = 0; i<sigfig; i++)
