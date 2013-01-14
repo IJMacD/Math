@@ -9,12 +9,20 @@ $(function(){
     var now = new Date();
     people.each(function(i,item){
       var item = $(item),
-          birthdate = item.data('birthdate');
+          birthdate = item.data('birthdate'),
+          deathdate = item.data('deathdate');
       if(!isFinite(birthdate)){
         birthdate = Date.parse(birthdate);
         item.data('birthdate', birthdate);
       }
-      item.find('p').text(logage(birthdate,now));
+      if(!isFinite(deathdate)){
+        deathdate = Date.parse(deathdate);
+        item.data('deathdate', deathdate);
+      }
+      if(deathdate)
+        item.find('p').text(logage(birthdate,deathdate));
+      else
+        item.find('p').text(logage(birthdate,now));
     });
     if(!sorted){
       people.sort(function(a,b){

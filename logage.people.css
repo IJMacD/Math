@@ -34,6 +34,20 @@
   padding: 5px;
   text-align: center;
 }
+.people-list li[data-deathdate] {
+  position: relative;
+}
+.people-list li[data-deathdate]::after {
+  bottom: 0;
+  content: '';
+  background-color: rgba(255,255,255,0.5);
+  background-image: url(deceased.png);
+  background-repeat: no-repeat;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 .people-list img {
   height: 90px;
   width: 90px;
