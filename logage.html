@@ -1,0 +1,180 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>
+var birthdate, running=!1, logage=0;
+var level = [], levelup = [], sigfig=10;
+var canvas, ctx, width=400,height=400,colors=[];
+function run(){
+	init();
+	loop();
+}
+function init()
+{
+	birthdate = Date.parse($('#birthdate').val());
+	running = !!birthdate;
+    canvas = document.getElementById('clock');
+    canvas.width = width;
+    canvas.height = height;
+    ctx = canvas.getContext('2d');
+	ctx.fillStyle = "rgb(255,255,255)";
+    ctx.lineEnd = "round";
+    colors[0] = [ 33, 25, 33];
+    colors[1] = [  0,132, 58];
+    colors[2] = [  0,153,222];
+    colors[3] = [ 39, 57,148];
+    colors[4] = [148,  0, 89];
+    colors[5] = [148,156,163];
+    colors[6] = [175, 92, 14];
+    colors[7] = [239, 39, 34];
+    colors[8] = [247,134,166];
+    colors[9] = [255,206,  1];
+}
+function loop(){
+	if(running)
+	{
+		physics();
+		render();
+	}
+	setTimeout("loop()",50);
+}
+function physics(){
+	d = (new Date()).getTime()
+	logage = Math.log((d - birthdate) / (1000 * 60 * 60 * 24 * 365)) * Math.LOG10E
+    
+    // Now Calculate required time to level up each significant figure
+    for(var i = 0; i<sigfig; i++)
+    {
+        var curr_level = Math.floor(logage*Math.pow(10,i));
+        var next_level = curr_level + 1;
+        curr_level = curr_level * Math.pow(10,-i);
+        next_level = next_level * Math.pow(10,-i);
+        var log_diff = Math.pow(10,next_level) - Math.pow(10,curr_level);
+        level[i] = log_diff;
+        var log_diff = Math.pow(10,next_level) - Math.pow(10,logage);
+        levelup[i] = log_diff;
+    }
+}
+function render(){
+	$('#logage').text(logage);
+    $('p').each(function(i)
+    {
+        if(levelup[i])
+        {
+            var level_txt = yearsToReadable(level[i]);
+            if(level_txt == "too tiny...")
+                $(this).text(level_txt);
+            else
+                $(this).html(level_txt+"<br>"+yearsToReadable(levelup[i]));
+        }
+    });
+
+	ctx.fillRect (0, 0, width, height);
+    ctx.lineWidth = 0.5;
+    setStrokeColour(ctx,0);
+    var c = 10,r=200;;
+    var th=0,dth=Math.PI*2/c;
+    ctx.beginPath();
+    ctx.arc(200,200,r,0,Math.PI*2,true);
+    for(var i=0;i<c;i++)
+    {
+        ctx.moveTo(200+r*(1-i/10),200);
+        ctx.arc(200,200,r*(1-i/10),0,Math.PI*2,true);
+        var x = 200+r*Math.sin(th);
+        var y = 200-r*Math.cos(th);
+        ctx.moveTo(200,200);
+        ctx.lineTo(x,y);
+        th+=dth;
+    }
+    ctx.stroke();
+    ctx.closePath();
+    
+    ctx.lineWidth = 3;
+    for(var i=0; i<10; i++)
+    {
+        var curr_level = Math.floor(logage*Math.pow(10,i));
+        var next_level = curr_level + 1;
+        curr_level = curr_level * Math.pow(10,-i);
+        next_level = next_level * Math.pow(10,-i);
+        var lvl = Math.pow(10,next_level) - Math.pow(10,curr_level);
+        var lvlup = Math.pow(10,logage) - Math.pow(10,curr_level);
+        var th = (lvlup / lvl) * 2 * Math.PI;
+        var r = (1-(i/10))*200;
+        var x = 200+r*Math.sin(th);
+        var y = 200-r*Math.cos(th);
+        setStrokeColour(ctx,i);
+        ctx.beginPath();
+        ctx.moveTo(200,200);
+        ctx.lineTo(x,y);
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
+levels = [[365,"day"], [24,"hour"], [60,"minute"], [60,"second"], [1000,"millisecond"], [1000,"microsecond"]];
+function yearsToReadable(years)
+{
+    if(years > 1)
+        return Math.floor(years) + " years";
+    for(var key in levels)
+    {
+        years *= levels[key][0];
+        if(years > 2)
+            return Math.floor(years) + " " + levels[key][1] + "s";
+        if(years > 1)
+            return Math.floor(years) + " " + levels[key][1];
+    }
+    return "too tiny...";
+}
+function setStrokeColour(ctx, colour)
+{
+    var c = colors[colour];
+    ctx.strokeStyle = "rgb("+c[0]+","+c[1]+","+c[2]+")";
+}
+</script>
+<style>
+body {
+    overflow:hidden;
+    font-family: sans-serif;
+    text-align: center;
+}
+output {
+    font-size: 150pt;
+    display: block;
+    text-shadow: 2px 2px 5px black;
+    color: black;
+}
+p {
+    float: left;
+    width: 108px;
+    border-left: 1px solid black;
+    height: 40px;
+    padding: 20px 1px 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: 10pt;
+}
+canvas {
+    height: 400px;
+    width: 400px;
+    margin: 0px auto;
+}
+</style>
+</head>
+<body onload="run()">
+<input id="birthdate" onchange="init();">
+<output id="logage">&nbsp;</output>
+<p style="margin-right: 68px;">90 years</p>
+<p>5 years</p>
+<p>186 days</p>
+<p>19 days</p>
+<p>45 hours</p>
+<p>5 hours</p>
+<p>27 minutes</p>
+<p>161 seconds</p>
+<p>16 seconds</p>
+<p>1.6 seconds</p>
+<canvas id="clock"></canvas>
+</body>
+</html>
