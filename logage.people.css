@@ -58,3 +58,21 @@
   white-space: nowrap;
   width: 92px;
 }
+.key {
+  border: 1px solid #999;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px #333;
+  display: inline-block;
+  font-size: 0.8em;
+}
+.key .dh {
+  font-weight: bold;
+}
+.key dt {
+  font-weight: normal;
+  width: 100px;
+}
+.key dd {
+  margin-left: 120px;
+  margin-right: 20px;
+}
