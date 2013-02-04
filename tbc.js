@@ -69,14 +69,19 @@ function initialiseDimensions() {
 		mSVGElement.setAttribute('width', mCanvasWidth);
 	}
 	
-	mRadius = 0.4 * Math.min(width, height);
-	
-	divs_in_circle = MAX_POWER + 1; //Max plus 1 for gap and none for zero
-	
-	each_arc = 2.0 * Math.PI / divs_in_circle;
-	
-	// Circumference divided by number of arcs ( * 80%)
-	mDiscSize = (0.8 * mRadius * each_arc);
+	if(mLayout == LAYOUT_CIRCLE){
+		mRadius = 0.4 * Math.min(width, height);
+
+		divs_in_circle = MAX_POWER + 1; //Max plus 1 for gap and none for zero
+
+		each_arc = 2.0 * Math.PI / divs_in_circle;
+
+		// Circumference divided by number of arcs ( * 80%)
+		mDiscSize = (0.8 * mRadius * each_arc);
+	}
+	else if(mLayout == LAYOUT_SQUARE){
+		mDiscSize = 0.8 * Math.min(width, height) / 4;
+	}
 	
 	midX = (width / 2.0);
 	midY = (height / 2.0);
@@ -93,7 +98,7 @@ function createSVGClock(targetDiv)
 {
 	mType = TYPE_SVG;
 	
-	html = '<svg id="svgclock" xmlns="http://www.w3.org/2000/svg" height="'+mCanvasHeight+'" width="'+mCanvasWidth+'">'
+	html = '<svg id="svgclock" xmlns="http://www.w3.org/2000/svg" height="'+(mCanvasHeight-4)+'" width="'+mCanvasWidth+'">'
 		+ '<defs>'
 		+ '<linearGradient id="linearGradient3626" ><stop id="stop3628" offset="0" style="stop-color:#3d4042;stop-opacity:1;" ></stop><stop id="stop3630" offset="1" style="stop-color:#000000;stop-opacity:1;" ></stop></linearGradient><linearGradient id="linearGradient3620" ><stop id="stop3622" offset="0" style="stop-color:#323232;stop-opacity:1;" ></stop><stop id="stop3624" offset="1" style="stop-color:#000000;stop-opacity:1;" ></stop></linearGradient><linearGradient id="linearGradient3602" ><stop style="stop-color:#00a800;stop-opacity:1;" offset="0" id="stop3604" ></stop><stop style="stop-color:#005200;stop-opacity:1;" offset="1" id="stop3606" ></stop></linearGradient><linearGradient id="linearGradient3592" ><stop style="stop-color:#bbdd4b;stop-opacity:1;" offset="0" id="stop3594" ></stop><stop style="stop-color:#00b400;stop-opacity:1;" offset="1" id="stop3596" ></stop></linearGradient>'
 		+ '<radialGradient id="radialGradient3600" xlink:href="#linearGradient3592" cx="0.65" cy="0.35" fx="0.65" fy="0.35" r="0.81428574" gradientUnits="objectBoundingBox" ></radialGradient>'
