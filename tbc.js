@@ -164,8 +164,8 @@ function drawVideo(){
 		{
 			for(col = 0; col < 4 && i >= 0; col++, i--)
 			{
-				x = (col + 1) * mDiscSize * 1.2;
-				y = (row + 1) * mDiscSize * 1.2;
+				x = (col - 1.5) * mDiscSize * 1.2 + (width / 2);
+				y = (row - 1.5) * mDiscSize * 1.2 + (height / 2);
 				test = currentDaySecs & Math.pow(2, i);
 				if(test != 0){
 					drawDisc(i, x, y, mDiscSize / 2, LIGHT_ON);
