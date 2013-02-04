@@ -13,6 +13,7 @@ var LAYOUT_NULL = 0;
 var LAYOUT_CIRCLE = 1;
 var LAYOUT_SQUARE = 2;
 var LAYOUT_SIZES = 3;
+var LAYOUT_LINEAR = 4;
 var LIGHT_OFF = 0;
 var LIGHT_ON = 1;
 var IMG_DISC = '/img/greenlight.png';
@@ -24,7 +25,7 @@ var SVG_STRK_OF = 'linearGradient3616';
 
 var mMode = MODE_BINSECS;//MODE_NULL;
 var mType = TYPE_IMG;
-var mLayout = LAYOUT_SIZES;
+var mLayout = LAYOUT_LINEAR;
 var mDebug = false;
 var mCanvasHeight;
 var mCanvasWidth;
@@ -81,6 +82,12 @@ function initialiseDimensions() {
 	}
 	else if(mLayout == LAYOUT_SQUARE){
 		mDiscSize = 0.8 * Math.min(width, height) / 4;
+	}
+	else if(mLayout == LAYOUT_LINEAR){
+		// mEachBlock:
+		each_block = width / MAX_POWER;
+		// Disk size is 80% of relevant dimension of block
+		mDiscSize = 0.8 * Math.min(height, each_block);
 	}
 	
 	midX = (width / 2.0);
@@ -168,6 +175,20 @@ function drawVideo(){
 				if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
 			}
 			row++;
+		}
+	}
+	else if(mLayout == LAYOUT_LINEAR)
+	{
+		y = midY;
+		for(i = 0; i < MAX_POWER; i++){
+			x = (each_block / 2) + (i * each_block);
+			test = currentDaySecs & Math.pow(2, MAX_POWER - i - 1);
+			if(test != 0){
+				drawDisc(i, x, y, mDiscSize / 2, LIGHT_ON);
+			}else{
+				drawDisc(i, x, y, mDiscSize / 2, LIGHT_OFF);
+			}
+			if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
 		}
 	}
 	else if(mLayout == LAYOUT_SIZES)
