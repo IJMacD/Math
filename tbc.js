@@ -35,7 +35,7 @@ var mTargetDiv;
 var mSVGElement;
 var mLayer1;
 
-function createClock(targetDiv, width, height){
+function createClock(targetDiv, width, height, layout){
 	if(!targetDiv){
 		alert("Error");
 		return;
@@ -43,6 +43,7 @@ function createClock(targetDiv, width, height){
 	mTargetDiv = targetDiv;
 	mCanvasWidth = width || DEFAULT_WIDTH;
 	mCanvasHeight = height || DEFAULT_HEIGHT;
+	mLayout = layout || mLayout;
 	initialiseDimensions();
 	if(1)
 		createSVGClock(targetDiv);
