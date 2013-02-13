@@ -31,8 +31,12 @@
 		width: 29%;
 	}
 	#julian {
-		height: 10%;
 		width: 100%;
+	}
+	#tbc_concentric,
+	#tbc_circle {
+		height: 40%;
+		width: 49%;
 	}
 	</style>
 </head>
@@ -43,6 +47,8 @@
 		<div id="tbc_square"></div>
 		<div id="tbc_root2"></div>
 		<div id="julian"></div>
+		<div id="tbc_concentric"></div>
+		<div id="tbc_circle"></div>
 	</div>
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="tbc.js"></script>
@@ -53,6 +59,8 @@
 		TBC.createClock('tbc_square', TBC.LAYOUT_SQUARE);
 		TBC.createClock('tbc_root2', TBC.LAYOUT_ROOT2);
 		new Julian('#julian');
+		TBC.createClock('tbc_concentric', TBC.LAYOUT_CONCENTRIC);
+		TBC.createClock('tbc_circle', TBC.LAYOUT_CIRCLE);
 	});
 	</script>
 </body>
