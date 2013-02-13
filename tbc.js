@@ -247,8 +247,9 @@
 			}
 			else if(mLayout == LAYOUT_ROOT2)
 			{
-				var x = 0,
-					w = midX,
+				var factor = 2,
+					x = 0,
+					w = mCanvasWidth/factor,
 					y = 0,
 					h = mCanvasHeight,
 					i;
@@ -257,16 +258,22 @@
 					test = currentDaySecs & Math.pow(2, i);
 					drawRect(i, x, y, w, h, test ? LIGHT_ON : LIGHT_OFF);
 
-					if(i%2){
+					if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
+
+					if(i == 1){
 						x = x+w;
-						h = h / 2;
+						w = w * (factor - 1);
+					}
+					else if(i%2){
+						x = x+w;
+						h = h / factor;
+						w = w * (factor - 1);
 					}
 					else {
 						y = y+h;
-						w = w / 2;
+						w = w / factor;
+						h = h * (factor - 1);
 					}
-
-					if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
 				}
 			}
 			if(mDebug) drawText(145, 225, currentDaySecs, RED);
