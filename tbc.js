@@ -16,6 +16,7 @@
 		LAYOUT_SIZES = 3,
 		LAYOUT_LINEAR = 4,
 		LAYOUT_CONCENTRIC = 5,
+		LAYOUT_ROOT2 = 6,
 		LIGHT_OFF = 0,
 		LIGHT_ON = 1,
 		IMG_DISC = '/img/greenlight.png',
@@ -244,6 +245,30 @@
 					if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
 				}
 			}
+			else if(mLayout == LAYOUT_ROOT2)
+			{
+				var x = 0,
+					w = midX,
+					y = 0,
+					h = mCanvasHeight,
+					i;
+				for(i = MAX_POWER - 1; i >= 0; i--)
+				{
+					test = currentDaySecs & Math.pow(2, i);
+					drawRect(i, x, y, w, h, test ? LIGHT_ON : LIGHT_OFF);
+
+					if(i%2){
+						x = x+w;
+						h = h / 2;
+					}
+					else {
+						y = y+h;
+						w = w / 2;
+					}
+
+					if(mDebug) drawText(x-10, y+10, Math.pow(2, i), RED);
+				}
+			}
 			if(mDebug) drawText(145, 225, currentDaySecs, RED);
 		},
 
@@ -256,6 +281,18 @@
 					break;
 				case TYPE_SVG:
 					drawSVGDisc(i, x, y, r, state);
+					break;
+			}
+		},
+
+		drawRect = function(i, x, y, w, h, state)
+		{
+			switch(mType)
+			{
+				case TYPE_IMG:
+					break;
+				case TYPE_SVG:
+					drawSVGRect(i, x, y, w, h, state);
 					break;
 			}
 		},
@@ -278,7 +315,6 @@
 			var disc = null;
 			if(!(disc = $('disc_'+mSVGId+'_'+i))){
 				disc = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-				//disc = document.createElement('circle');
 				disc.setAttribute('id', 'disc_'+mSVGId+'_'+i);
 				mSVGLayer.appendChild(disc);
 			}
@@ -290,6 +326,22 @@
 			disc.setAttribute('style', 'fill:url(#'+fill+');stroke:url(#'+stroke+');stroke-width:'+mStrokeWidth);
 		},
 
+		drawSVGRect = function(i, x, y, w, h, state){
+			var disc = null;
+			if(!(disc = $('rect_'+mSVGId+'_'+i))){
+				disc = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+				disc.setAttribute('id', 'rect_'+mSVGId+'_'+i);
+				mSVGLayer.appendChild(disc);
+			}
+			fill = (state == LIGHT_ON) ? SVG_FILL_ON : SVG_FILL_OF;
+			stroke = (state == LIGHT_ON) ? SVG_STRK_ON : SVG_STRK_OF;
+			disc.setAttribute('x', x);
+			disc.setAttribute('y', y);
+			disc.setAttribute('width', w);
+			disc.setAttribute('height', h);
+			disc.setAttribute('style', 'fill:url(#'+fill+');stroke:url(#'+stroke+');stroke-width:'+mStrokeWidth);
+		},
+
 		tempDiscPool = [],
 		tempDiscCount = 0,
 		mAnimations = [],
@@ -298,7 +350,6 @@
 			var tempDisc;
 			if(!(tempDisc = tempDiscPool.pop())){
 				tempDisc = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-				tempDisc.setAttribute('id', 'discTemp_'+mSVGId+'_'+(++tempDiscCount));
 				tempDisc.setAttribute('r', mDiscSize/2);
 				tempDisc.setAttribute('style', 'fill:url(#'+SVG_FILL_ON+');stroke:url(#'+SVG_STRK_ON+');stroke-width:'+mStrokeWidth);
 			}
@@ -392,7 +443,8 @@
 		LAYOUT_SQUARE: LAYOUT_SQUARE,
 		LAYOUT_SIZES: LAYOUT_SIZES,
 		LAYOUT_CONCENTRIC: LAYOUT_CONCENTRIC,
-		LAYOUT_LINEAR: LAYOUT_LINEAR
+		LAYOUT_LINEAR: LAYOUT_LINEAR,
+		LAYOUT_ROOT2: LAYOUT_ROOT2
 	}
 
 }(window));
