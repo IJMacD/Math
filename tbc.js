@@ -38,7 +38,7 @@
 		}
 
 		var mMode = MODE_BINSECS,
-			mType = TYPE_IMG,
+			mType = TYPE_SVG,
 			mLayout = layout || LAYOUT_LINEAR,
 			mDebug = false,
 			mCanvasWidth = width || DEFAULT_WIDTH,
@@ -51,11 +51,12 @@
 			mSVGId,
 			mStrokeWidth = SVG_STRK_W,
 			mLights = [],
+			midX, midY,
 
 		initialiseDimensions = function() {
 
-			//if(mTargetDiv.clientHeight == 0)
-				//mTargetDiv.style.height = mCanvasHeight + "px";
+			if(mTargetDiv.clientHeight == 0)
+				mTargetDiv.style.height = mCanvasHeight + "px";
 			if(mTargetDiv.clientWidth == 0)
 				mTargetDiv.style.width = mCanvasWidth + "px";
 
@@ -437,9 +438,9 @@
 
 		initialiseDimensions();
 
-		if(1)
+		if(mType == TYPE_SVG)
 			createSVGClock(targetDiv);
-		else
+		else if(mType == TYPE_IMG)
 			createImgClock(targetDiv);
 
 		requestAnimationFrame(loop);

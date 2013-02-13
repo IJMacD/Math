@@ -22,18 +22,24 @@
 		height: 10%;
 		width: 50%;
 	}
+	#tbc_square {
+		height: 20%;
+		width: 25%;
+	}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<h1>Clocks</h1>
 		<div id="tbc_linear"></div>
+		<div id="tbc_square"></div>
 	</div>
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="tbc.js"></script>
 	<script>
 	$(function () {
 		TBC.createClock('tbc_linear');
+		TBC.createClock('tbc_square', TBC.LAYOUT_SQUARE);
 	});
 	</script>
 </body>
