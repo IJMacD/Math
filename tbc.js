@@ -23,7 +23,8 @@
 		SVG_FILL_ON = 'radialGradient3600',
 		SVG_STRK_ON = 'linearGradient3608',
 		SVG_FILL_OF = 'radialGradient3618',
-		SVG_STRK_OF = 'linearGradient3616';
+		SVG_STRK_OF = 'linearGradient3616',
+		SVG_STRK_W = 2.5;
 
 	var createClock = function(targetDiv, width, height, layout){
 
@@ -47,6 +48,8 @@
 			mSVGElement,
 			mSVGLayer,
 			mSVGId,
+			mStrokeWidth = SVG_STRK_W,
+			mLights = [],
 
 		initialiseDimensions = function() {
 			mTargetDiv.style.position = 'relative';
@@ -181,11 +184,23 @@
 			}
 			else if(mLayout == LAYOUT_LINEAR)
 			{
-				var y = midY, i, x, test;
-				for(i = 0; i < MAX_POWER; i++){
+				var y = midY, i, j, x, test, oldTest,
+					firstOff = 0, toMove = [];
+				for(i = MAX_POWER - 1; i >= 0; i--){
+					oldTest = mLights[i];
+					mLights[i] = currentDaySecs & Math.pow(2, MAX_POWER - i - 1);
 					x = (each_block / 2) + (i * each_block);
-					test = currentDaySecs & Math.pow(2, MAX_POWER - i - 1);
-					if(test != 0){
+					if(!firstOff && !mLights[i] && oldTest){
+						hideSVGDisc(MAX_POWER - i - 1);
+						toMove.push([x,y]);
+					}
+					else if(!firstOff){
+						firstOff = i;
+						for(j=toMove.length-1;j>=0;j--){
+							animateSVGDisc(toMove[j],[x,y],250);
+						}
+					}
+					if(mLights[i] != 0){
 						drawDisc(i, x, y, mDiscSize / 2, LIGHT_ON);
 					}else{
 						drawDisc(i, x, y, mDiscSize / 2, LIGHT_OFF);
@@ -272,7 +287,59 @@
 			disc.setAttribute('cx', x);
 			disc.setAttribute('cy', y);
 			disc.setAttribute('r',  r);
-			disc.setAttribute('style', 'fill:url(#'+fill+');stroke:url(#'+stroke+');stroke-width:2.5');
+			disc.setAttribute('style', 'fill:url(#'+fill+');stroke:url(#'+stroke+');stroke-width:'+mStrokeWidth);
+		},
+
+		tempDiscPool = [],
+		tempDiscCount = 0,
+		mAnimations = [],
+
+		animateSVGDisc = function(from, to, time){
+			var tempDisc;
+			if(!(tempDisc = tempDiscPool.pop())){
+				tempDisc = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+				tempDisc.setAttribute('id', 'discTemp_'+mSVGId+'_'+(++tempDiscCount));
+				tempDisc.setAttribute('r', mDiscSize/2);
+				tempDisc.setAttribute('style', 'fill:url(#'+SVG_FILL_ON+');stroke:url(#'+SVG_STRK_ON+');stroke-width:'+mStrokeWidth);
+			}
+			tempDisc.setAttribute('cx', from[0]);
+			tempDisc.setAttribute('cy', from[1]);
+			mSVGLayer.appendChild(tempDisc);
+			mAnimations.push([tempDisc,from,to,time]);
+		},
+
+		hideSVGDisc = function(i){
+			if(disc = $('disc_'+mSVGId+'_'+i)){
+				disc.setAttribute('cy', -100);
+			}
+		},
+
+		lastTime = 0,
+
+		runAnimations = function(pageTime){
+			var delta = pageTime - lastTime,
+				i, anim, disc, from, to, time, frac,
+				animations = [];
+			for (i = mAnimations.length - 1; i >= 0; i--) {
+				anim = mAnimations[i];
+				disc = anim[0];
+				from = anim[1];
+				to = anim[2];
+				time = anim[3];
+				frac = delta / time;
+				from = [(to[0] - from[0])*frac + from[0], (to[1] - from[1])*frac + from[1]];
+				if(time <=0){
+					mSVGLayer.removeChild(disc);
+					tempDiscPool.push(disc);
+				}
+				else{
+					disc.setAttribute('cx', from[0]);
+					disc.setAttribute('cy', from[1]);
+					animations.push([disc,from,to,time - delta]);
+				}
+			};
+			mAnimations = animations;
+			lastTime = pageTime;
 		},
 
 		drawText = function(x, y, text, color){},
@@ -288,6 +355,12 @@
 		    } else if ( elem.attachEvent ) {
 		        elem.attachEvent( "on" + type, eventHandle );
 		    }
+		},
+
+		loop = function(time){
+			drawVideo(time);
+			runAnimations(time);
+			requestAnimationFrame(loop);
 		};
 
 
@@ -307,7 +380,7 @@
 		else
 			createImgClock(targetDiv);
 
-		setInterval(drawVideo, 50);
+		requestAnimationFrame(loop);
 		addEvent(window, "resize", initialiseDimensions );
 	}
 
