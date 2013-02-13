@@ -94,6 +94,9 @@
 				// Disk size is 80% of relevant dimension of block
 				mDiscSize = 0.8 * Math.min(height, each_block);
 			}
+			else if(mLayout == LAYOUT_ROOT2){
+				mStrokeWidth = Math.min(width, height) * 0.005;
+			}
 
 			midX = (width / 2.0);
 			midY = (height / 2.0);
@@ -267,7 +270,12 @@
 
 					if(i == 1){
 						x = x+w;
-						w = w * (factor - 1);
+						w = w / (factor - 1);
+					}
+					else if(i == 2){
+						y = y+h;
+						w = w * (factor - 1) / factor;
+						h = h * (factor - 1);
 					}
 					else if(i%2){
 						x = x+w;
