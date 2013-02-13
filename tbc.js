@@ -53,21 +53,25 @@
 			mLights = [],
 
 		initialiseDimensions = function() {
-			mTargetDiv.style.position = 'relative';
-			mTargetDiv.style.background = 'black';
 
-			if(mTargetDiv.clientHeight == 0)
-				mTargetDiv.style.height = mCanvasHeight + "px";
-			if(mTargetDiv.clientHeight == 0)
+			//if(mTargetDiv.clientHeight == 0)
+				//mTargetDiv.style.height = mCanvasHeight + "px";
+			if(mTargetDiv.clientWidth == 0)
 				mTargetDiv.style.width = mCanvasWidth + "px";
 
 			mCanvasHeight = height = mTargetDiv.clientHeight;
 			mCanvasWidth =  width = mTargetDiv.clientWidth;
 
-			if(mSVGElement)
-			{
-				mSVGElement.setAttribute('height', mCanvasHeight);
-				mSVGElement.setAttribute('width', mCanvasWidth);
+
+			if(mType == TYPE_IMG){
+				mTargetDiv.style.position = 'relative';
+			}
+			else if(mType == TYPE_SVG) {
+				if(mSVGElement)
+				{
+					mSVGElement.setAttribute('height', mCanvasHeight);
+					mSVGElement.setAttribute('width', mCanvasWidth);
+				}
 			}
 
 			if(mLayout == LAYOUT_CIRCLE){
