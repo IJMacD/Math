@@ -18,9 +18,16 @@
 	.container {
 		display: block;
 	}
-	#tbc_linear {
+	#cell1 {
 		height: 10%;
 		width: 40%;
+	}
+	#ISO {
+		font-size: 2em;
+	}
+	#tbc_linear {
+		height: 50%;
+		width: 100%;
 	}
 	#tbc_square {
 		height: 20%;
@@ -43,7 +50,10 @@
 <body>
 	<div class="container">
 		<h1>Clocks</h1>
-		<div id="tbc_linear"></div>
+		<div id="cell1">
+			<div id="ISO"></div>
+			<div id="tbc_linear"></div>
+		</div>
 		<div id="tbc_square"></div>
 		<div id="tbc_root2"></div>
 		<div id="julian"></div>
@@ -61,6 +71,13 @@
 		new Julian('#julian');
 		TBC.createClock('tbc_concentric', TBC.LAYOUT_CONCENTRIC);
 		TBC.createClock('tbc_circle', TBC.LAYOUT_CIRCLE);
+
+		var iso = $('#ISO'),
+			f = function(){
+				iso.text((new Date).toISOString());
+				requestAnimationFrame(f);
+			};
+		requestAnimationFrame(f);
 	});
 	</script>
 </body>
