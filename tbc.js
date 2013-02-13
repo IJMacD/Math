@@ -247,7 +247,7 @@
 			}
 			else if(mLayout == LAYOUT_ROOT2)
 			{
-				var factor = 2,
+				var factor = Math.E,
 					x = 0,
 					w = mCanvasWidth/factor,
 					y = 0,
