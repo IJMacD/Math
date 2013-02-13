@@ -270,7 +270,12 @@
 
 					if(i == 1){
 						x = x+w;
-						w = w * (factor - 1);
+						w = w / (factor - 1);
+					}
+					else if(i == 2){
+						y = y+h;
+						w = w * (factor - 1) / factor;
+						h = h * (factor - 1);
 					}
 					else if(i%2){
 						x = x+w;
